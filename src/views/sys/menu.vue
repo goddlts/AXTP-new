@@ -1,10 +1,305 @@
 <template>
-  <div>menu</div>
+  <div class="app-container">
+    <!-- 表头 -->
+    <div class="filter-container">
+      <el-input v-model="searchValue" size="small" placeholder="请输入菜单" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-button size="small" style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        搜索
+      </el-button>
+      <el-button size="small" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
+        添加菜单
+      </el-button>
+    </div>
+    <!-- 表格 -->
+    <el-table
+      v-loading="listLoading"
+      :data="list"
+      element-loading-text="Loading"
+      row-key="id"
+      :tree-props="{children: 'children'}"
+      border
+      stripe
+      fit
+      highlight-current-row
+    >
+      <el-table-column label="类型" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.type }}
+        </template>
+      </el-table-column>
+      <el-table-column label="名称" align="center" width="150">
+        <template slot-scope="scope">
+          {{ scope.row.menu_name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="编码" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.route_name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="图标" align="center">
+        <template slot-scope="scope">
+          <i :class="scope.row.icon" />
+        </template>
+      </el-table-column>
+      <el-table-column label="组件" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.component }}
+        </template>
+      </el-table-column>
+      <el-table-column label="URL" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.url }}
+        </template>
+      </el-table-column>
+      <el-table-column label="是否隐藏" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.hidden }}
+        </template>
+      </el-table-column>
+      <el-table-column label="排序" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.order }}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" width="150">
+        <template slot-scope="scope">
+          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row)">编辑</el-button>
+          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <el-pagination
+      style="margin-top: 10px"
+      :current-page="1"
+      :page-sizes="[8, 16, 32, 64]"
+      :page-size="8"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="400"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    />
+    <!-- 弹出框 -->
+    <el-dialog label-width="10px" :title="dialogTitle" :visible.sync="dialogFormVisible">
+      <el-form :model="form" label-width="100px">
+        <el-form-item label="类型">
+          <el-radio-group v-model="form.type" @change="handleRadioChange">
+            <el-radio label="目录">目录</el-radio>
+            <el-radio label="菜单">菜单</el-radio>
+            <el-radio label="按钮">按钮</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="form.type + '名称'">
+          <el-input v-model="form.menu_name" />
+        </el-form-item>
+        <el-form-item
+          v-if="form.type === '按钮' || form.type === '菜单'"
+          label="上级菜单"
+        >
+          <!-- 下拉框 -->
+          <el-select v-if="form.type === '菜单'" v-model="form.parent_id" placeholder="请选择父级目录">
+            <el-option disabled label="请选择父级目录" :value="-1" />
+            <el-option
+              v-for="item in options"
+              :key="item.id"
+              :label="item.menu_name"
+              :value="item.id"
+            />
+          </el-select>
+          <!-- 级联下拉框 -->
+          <el-cascader
+            v-if="form.type === '按钮'"
+            v-model="form.parent_id"
+            :options="options"
+            :props="{
+              expandTrigger: 'hover',
+              label: 'menu_name',
+              value: 'id'
+            }"
+            placeholder="请选择父级菜单"
+          />
+        </el-form-item>
+        <el-form-item
+          v-if="form.type === '目录' || form.type === '菜单'"
+          label="编码"
+        >
+          <el-input v-model="form.route_name" />
+        </el-form-item>
+        <el-form-item
+          v-if="form.type !== '按钮'"
+          label="组件"
+        >
+          <el-input v-model="form.component" />
+        </el-form-item>
+        <el-form-item :label="form.type === '按钮' ? '权限标识' : '路由地址'">
+          <el-input v-model="form.url" />
+        </el-form-item>
+        <el-form-item v-if="form.type !== '按钮'" label="排序">
+          <el-input-number v-model="form.order" :min="0" :max="100" controls-position="right" />
+        </el-form-item>
+        <el-form-item v-if="form.type !== '按钮'" label="图标">
+          <el-input v-model="form.icon" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleSure">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
-export default {
+// import { getList, removeMenu, addMenu, editMenu, getMenuById, getMenuSelect } from '@/api/menu'
+import { getList, removeMenu, addMenu, editMenu, getMenuSelect } from '@/api/menu'
 
+export default {
+  data () {
+    return {
+      list: [],
+      listLoading: true,
+      searchValue: '',
+      // 分页数据
+      pagenum: 1,
+      pagesize: 10,
+      total: 0,
+      // 弹出框数据
+      dialogTitle: '',
+      dialogFormVisible: false,
+      form: {
+        parent_id: -1,
+        menu_name: '',
+        route_name: '',
+        icon: '',
+        component: '',
+        type: '目录',
+        url: '',
+        hidden: false,
+        order: 0
+      },
+      // 下拉框绑定的数据
+      options: []
+    }
+  },
+  created () {
+    this.fetchData()
+  },
+  methods: {
+    fetchData () {
+      this.listLoading = true
+      getList({
+        pagenum: this.pagenum,
+        pagesize: this.pagesize,
+        query: this.searchValue
+      }).then(response => {
+        this.list = response.data.items
+        this.total = response.data.total
+        this.listLoading = false
+      })
+    },
+    // 获取下拉框中的数据
+    loadMenuSelect (level) {
+      getMenuSelect(level)
+        .then(res => {
+          this.options = res.data
+        })
+    },
+    // 单选框改变
+    handleRadioChange (value) {
+      let level = -1
+      if (value === '菜单') {
+        level = 1
+        this.loadMenuSelect(level)
+      } else if (value === '按钮') {
+        level = 2
+        this.loadMenuSelect(level)
+      }
+    },
+    // 搜索
+    handleFilter () {
+      this.pagenum = 1
+      this.fetchData()
+    },
+    // 点击打开添加对话框
+    handleShowAddDialog () {
+      this.dialogFormVisible = true
+      this.dialogTitle = '添加菜单'
+    },
+    // 点击编辑按钮
+    async handleShowEditDialog (menu) {
+      this.dialogFormVisible = true
+      this.dialogTitle = '修改菜单'
+      // const { data } = await getMenuById(menu.id)
+      // this.form = data
+      this.form = menu
+      let level = -1
+      if (menu.type === '菜单') {
+        level = 1
+        this.loadMenuSelect(level)
+      } else if (menu.type === '按钮') {
+        level = 2
+        this.loadMenuSelect(level)
+      }
+    },
+    // 弹出框的确定按钮
+    async handleSure () {
+      // 根据 type 判断，当前添加的是 目录/菜单/按钮，对数据处理
+      switch (this.form.type) {
+        case '目录':
+          this.form.parent_id = -1
+          this.form.component = 'layout'
+          break
+        case '菜单':
+          break
+        case '按钮':
+          this.form.parent_id = this.form.parent_id.length === 2 ? this.form.parent_id[1] : -1
+          break
+        default:
+          break
+      }
+
+      if (this.dialogTitle === '添加菜单') {
+        await addMenu(this.form)
+      } else if (this.dialogTitle === '修改菜单') {
+        await editMenu(this.form.id, this.form)
+      }
+      this.fetchData()
+      this.$message({
+        type: 'success',
+        message: '操作成功'
+      })
+      this.dialogFormVisible = false
+    },
+    // 分页方法
+    handleSizeChange (val) {
+      this.pagesize = val
+      this.pagenum = 1
+      this.fetchData()
+    },
+    handleCurrentChange (val) {
+      this.pagenum = val
+      this.fetchData()
+    },
+    // 删除
+    async handleDelete (id) {
+      await this.$confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      await removeMenu(id)
+      this.$message({
+        type: 'success',
+        message: '删除成功'
+      })
+      // 处理最后一页只有一条数据的问题
+      if (this.pagenum > 1 && this.list.count === 1) {
+        this.pagenum--
+      }
+      this.fetchData()
+    }
+  }
 }
 </script>
 
