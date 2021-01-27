@@ -2,12 +2,12 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-input v-model="searchValue" size="small" placeholder="请输入角色" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="searchValue" size="small" placeholder="请输入{{cname}}" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
       <el-button size="small" class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
-        添加角色
+        添加{{cname}}
       </el-button>
     </div>
     <!-- 表格 -->
@@ -21,26 +21,17 @@
       highlight-current-row
     >
       <el-table-column align="center" label="#" width="50" type="index" />
-      <el-table-column label="角色名称" align="center">
+      {{#each table}}
+      <el-table-column label="{{title}}" align="center">
         <template slot-scope="scope">
-          {{ scope.row.role_name }}
+          \{{ scope.row.{{field}} }}
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.created_time }}
-        </template>
-      </el-table-column>
-      <el-table-column label="描述" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.desc }}
-        </template>
-      </el-table-column>
+      {{/each}}
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
           <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
-          <el-button type="text" size="mini" icon="el-icon-setting" @click="setRightDialogFormVisible = true">权限配置</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -58,45 +49,41 @@
     <!-- 弹出框 -->
     <el-dialog label-width="10px" :title="dialogTitle" :visible.sync="dialogFormVisible">
       <el-form :model="form" label-width="100px">
-        <el-form-item label="角色名称">
-          <el-input v-model="form.role_name" />
+        {{#each dialog}}
+          {{#if is_id}}
+        <el-form-item label="{{title}}">
+          <el-select v-model="form.{{field}}" placeholder="请选择{{cname}}负责人">
+            <el-option label="请选择" :value="-1" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="备注信息">
+          {{else}}
+            {{#if desc}}
+        <el-form-item label="{{title}}">
           <el-input
-            v-model="form.desc"
+            v-model="form.{{field}}"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
           />
         </el-form-item>
+            {{else}}
+        <el-form-item label="{{title}}">
+          <el-input v-model="form.{{field}}" />
+        </el-form-item>
+            {{/if}}
+          {{/if}}
+        {{/each}}
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="handleSure">确 定</el-button>
       </div>
     </el-dialog>
-    <!-- 分配权限 -->
-    <el-dialog label-width="10px" title="分配角色" :visible.sync="setRightDialogFormVisible">
-      <el-tree
-        ref="tree"
-        :data="menuData"
-        node-key="id"
-        show-checkbox
-        accordion
-        :default-checked-keys="checkedIds"
-        :props="defaultProps"
-      />
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="setRightDialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="setRightDialogFormVisible = false">确 定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getList, removeRole, addRole, editRole, getRoleById } from '@/api/role'
-import { getRoutes } from '@/api/menu'
+import { getList, remove{{upperCase name}}, add{{upperCase name}}, edit{{upperCase name}}, get{{upperCase name}}ById } from '@/api/{{name}}'
 
 export default {
   data () {
@@ -112,20 +99,9 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        role_name: '',
-        desc: ''
-      },
-      // 分配权限数据
-      setRightDialogFormVisible: false,
-      menuData: [],
-      checkedIds: [],
-      defaultProps: {
-        // 配置树的节点显示的属性
-        label: function (data) {
-          return data.meta.title
-        },
-        // 配置子节点显示的属性
-        children: 'children'
+        {{#each dialog}}
+        {{field}}: {{{value}}}{{#compare @index ../dialog.length}},{{/compare}}
+        {{/each}}
       }
     }
   },
@@ -144,10 +120,6 @@ export default {
         this.total = response.data.total
         this.listLoading = false
       })
-      // 获取权限菜单
-      getRoutes().then(response => {
-        this.menuData = response.data
-      })
     },
     // 搜索
     handleFilter () {
@@ -157,21 +129,21 @@ export default {
     // 点击打开添加对话框
     handleShowAddDialog () {
       this.dialogFormVisible = true
-      this.dialogTitle = '添加角色'
+      this.dialogTitle = '添加{{cname}}'
     },
     // 点击编辑按钮
     async handleShowEditDialog (id) {
       this.dialogFormVisible = true
-      this.dialogTitle = '修改角色'
-      const { data } = await getRoleById(id)
+      this.dialogTitle = '修改{{cname}}'
+      const { data } = await get{{upperCase name}}ById(id)
       this.form = data
     },
     // 弹出框的确定按钮
     async handleSure () {
-      if (this.dialogTitle === '添加角色') {
-        await addRole(this.form)
-      } else if (this.dialogTitle === '修改角色') {
-        await editRole(this.form.id, this.form)
+      if (this.dialogTitle === '添加{{cname}}') {
+        await add{{upperCase name}}(this.form)
+      } else if (this.dialogTitle === '修改{{cname}}') {
+        await edit{{upperCase name}}(this.form.id, this.form)
       }
       this.fetchData()
       this.$message({
@@ -192,12 +164,12 @@ export default {
     },
     // 删除
     async handleDelete (id) {
-      await this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+      await this.$confirm('此操作将永久删除该{{cname}}, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
-      await removeRole(id)
+      await remove{{upperCase name}}(id)
       this.$message({
         type: 'success',
         message: '删除成功'

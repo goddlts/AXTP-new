@@ -10,7 +10,7 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['/login'] // no redirect whitelist
 
-router.beforeEach(async(to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // start progress bar
   NProgress.start()
 
@@ -40,7 +40,6 @@ router.beforeEach(async(to, from, next) => {
           // dynamically add accessible routes
           // 把服务器获取到的组件的字符串，转换成 vue 中的组件
           router.addRoutes(accessRoutes)
-          console.log(accessRoutes)
           // hack method to ensure that addRoutes is complete
           // set the replace: true, so the navigation will not leave a history record
 

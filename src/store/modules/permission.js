@@ -1,5 +1,5 @@
 import { constantRoutes } from '@/router'
-import { getRoutes } from '@/api/user'
+import { getRoutes } from '@/api/menu'
 import { traverseRoutes } from '@/utils/menu'
 
 const state = {
@@ -15,7 +15,7 @@ const mutations = {
 }
 
 const actions = {
-  generateRoutes({ commit }) {
+  generateRoutes ({ commit }) {
     return new Promise((resolve, reject) => {
       getRoutes().then(res => {
         if (res.meta.status === 200) {

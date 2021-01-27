@@ -1,4 +1,4 @@
-export function traverseRoutes(menus) {
+export function traverseRoutes (menus) {
   const routes = menus.map(menu => {
     if (menu.component) {
       const name = menu.component

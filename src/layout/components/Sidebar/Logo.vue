@@ -22,7 +22,7 @@ export default {
       required: true
     }
   },
-  data() {
+  data () {
     return {
       title: '翱 翔 教 学 平 台',
       logo: 'http://www.hdaccp.com/statics/images/hdaccp/logo.png'
