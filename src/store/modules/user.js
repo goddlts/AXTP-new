@@ -5,9 +5,10 @@ import { resetRouter } from '@/router'
 const getDefaultState = () => {
   return {
     token: getToken(),
-    name: '',
-    avatar: '',
-    roles: []
+    // 登录用户的个人信息
+    profile: {},
+    // 按钮权限列表
+    permissions: []
   }
 }
 
@@ -20,14 +21,11 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_NAME: (state, name) => {
-    state.name = name
+  SET_PROFILE: (state, profile) => {
+    state.profile = profile
   },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
-  },
-  SET_ROLES: (state, roles) => {
-    state.roles = roles
+  SET_PERMISSONS: (state, permissions) => {
+    state.permissions = permissions
   }
 }
 
@@ -36,7 +34,7 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ username: username.trim(), password: password.trim() }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
@@ -57,16 +55,15 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const { roles, name, avatar } = data
+        const { profile, permissions } = data
 
         // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
+        if (!profile.role) {
+          reject('getInfo: role must be not null!')
         }
 
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_PROFILE', profile)
+        commit('SET_PERMISSONS', permissions)
         resolve(data)
       }).catch(error => {
         reject(error)
