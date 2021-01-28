@@ -57,8 +57,13 @@
     />
     <!-- 弹出框 -->
     <el-dialog label-width="10px" :title="dialogTitle" :visible.sync="dialogFormVisible">
-      <el-form :model="form" label-width="100px">
-        <el-form-item label="角色名称">
+      <el-form
+        ref="ruleForm"
+        :rules="rules"
+        :model="form"
+        label-width="100px"
+      >
+        <el-form-item label="角色名称" prop="role_name">
           <el-input v-model="form.role_name" />
         </el-form-item>
         <el-form-item label="备注信息">
@@ -126,6 +131,13 @@ export default {
         },
         // 配置子节点显示的属性
         children: 'children'
+      },
+      // 表单验证数据
+      rules: {
+        role_name: [
+          { required: true, message: '请输入角色名称', trigger: 'blur' },
+          { pattern: /^[\u4e00-\u9fa5]{2,10}$/, message: '请输入2到10个汉字', trigger: 'blur' }
+        ]
       }
     }
   },
@@ -168,6 +180,17 @@ export default {
     },
     // 弹出框的确定按钮
     async handleSure () {
+      // 表单验证
+
+      let valid = false
+      await this.$refs.ruleForm.validate(v => {
+        valid = v
+      })
+      if (!valid) {
+        // 验证未通过返回
+        return false
+      }
+
       if (this.dialogTitle === '添加角色') {
         await addRole(this.form)
       } else if (this.dialogTitle === '修改角色') {
@@ -179,6 +202,7 @@ export default {
         message: '操作成功'
       })
       this.dialogFormVisible = false
+      this.$refs.ruleForm.resetFields()
     },
     // 分页方法
     handleSizeChange (val) {

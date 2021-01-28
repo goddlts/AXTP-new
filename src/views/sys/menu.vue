@@ -82,7 +82,13 @@
     />
     <!-- 弹出框 -->
     <el-dialog label-width="10px" :title="dialogTitle" :visible.sync="dialogFormVisible">
-      <el-form :model="form" label-width="100px">
+      <el-form
+        :key="form_key"
+        ref="ruleForm"
+        :rules="rules"
+        :model="form"
+        label-width="100px"
+      >
         <el-form-item label="类型">
           <el-radio-group v-model="form.type" @change="handleRadioChange">
             <el-radio label="目录">目录</el-radio>
@@ -90,16 +96,16 @@
             <el-radio label="按钮">按钮</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item :label="form.type + '名称'">
+        <el-form-item :label="form.type + '名称'" prop="menu_name">
           <el-input v-model="form.menu_name" />
         </el-form-item>
         <el-form-item
           v-if="form.type === '按钮' || form.type === '菜单'"
           label="上级菜单"
+          prop="parent_id"
         >
           <!-- 下拉框 -->
           <el-select v-if="form.type === '菜单'" v-model="form.parent_id" placeholder="请选择父级目录">
-            <el-option disabled label="请选择父级目录" :value="-1" />
             <el-option
               v-for="item in options"
               :key="item.id"
@@ -123,16 +129,18 @@
         <el-form-item
           v-if="form.type === '目录' || form.type === '菜单'"
           label="编码"
+          prop="route_name"
         >
           <el-input v-model="form.route_name" />
         </el-form-item>
         <el-form-item
-          v-if="form.type !== '按钮'"
+          v-if="form.type === '菜单'"
           label="组件"
+          prop="component"
         >
           <el-input v-model="form.component" />
         </el-form-item>
-        <el-form-item :label="form.type === '按钮' ? '权限标识' : '路由地址'">
+        <el-form-item :label="form.type === '按钮' ? '权限标识' : '路由地址'" prop="url">
           <el-input v-model="form.url" />
         </el-form-item>
         <el-form-item v-if="form.type !== '按钮'" label="排序">
@@ -167,8 +175,10 @@ export default {
       // 弹出框数据
       dialogTitle: '',
       dialogFormVisible: false,
+      // 给form 设置一个唯一key，当点击radio的时候重新设置
+      form_key: Math.random(),
       form: {
-        parent_id: -1,
+        parent_id: '',
         menu_name: '',
         route_name: '',
         icon: '',
@@ -179,7 +189,24 @@ export default {
         order: 0
       },
       // 下拉框绑定的数据
-      options: []
+      options: [],
+      rules: {
+        menu_name: [
+          { required: true, message: '请输入菜单名称', trigger: 'blur' }
+        ],
+        parent_id: [
+          { required: true, message: '请选择父菜单', trigger: 'change' }
+        ],
+        route_name: [
+          { required: true, message: '请输入编码', trigger: 'blur' }
+        ],
+        component: [
+          { required: true, message: '请输入组件', trigger: 'blur' }
+        ],
+        url: [
+          { required: true, message: '请输入URL', trigger: 'blur' }
+        ]
+      }
     }
   },
   created () {
@@ -207,6 +234,7 @@ export default {
     },
     // 单选框改变
     handleRadioChange (value) {
+      this.form_key = Math.random()
       let level = -1
       if (value === '菜单') {
         level = 1
@@ -244,16 +272,28 @@ export default {
     },
     // 弹出框的确定按钮
     async handleSure () {
+      // 表单验证
+      let valid = false
+      await this.$refs.ruleForm.validate(v => {
+        valid = v
+      })
+      if (!valid) {
+        // 验证未通过返回
+        return false
+      }
+
+      console.log(this.form.parent_id)
+
       // 根据 type 判断，当前添加的是 目录/菜单/按钮，对数据处理
       switch (this.form.type) {
         case '目录':
-          this.form.parent_id = -1
+          this.form.parent_id = ''
           this.form.component = 'layout'
           break
         case '菜单':
           break
         case '按钮':
-          this.form.parent_id = this.form.parent_id.length === 2 ? this.form.parent_id[1] : -1
+          this.form.parent_id = this.form.parent_id.length === 2 ? this.form.parent_id[1] : ''
           break
         default:
           break
@@ -270,6 +310,7 @@ export default {
         message: '操作成功'
       })
       this.dialogFormVisible = false
+      this.$refs.ruleForm.resetFields()
     },
     // 分页方法
     handleSizeChange (val) {
