@@ -34,14 +34,16 @@ module.exports = function (plop) {
           type: 'add',
           path: 'src/views/{{parent}}/{{name}}.vue',
           templateFile: 'plop-templates/view/index.hbs',
-          data: config
+          data: config,
+          force: true
         }
       )
 
       actions.push({
         type: 'add',
         path: 'src/api/{{name}}.js',
-        templateFile: 'plop-templates/api/index.hbs'
+        templateFile: 'plop-templates/api/index.hbs',
+        force: true
       })
 
       return actions

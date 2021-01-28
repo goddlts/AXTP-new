@@ -48,12 +48,12 @@ module.exports = {
     {
       'title': '班级名称',
       'field': 'class_name',
-      'value': "''",
+      'value': "''"
     },
     {
       'title': '班级状态',
       'field': 'status',
-      'value': "'在读'",
+      'value': "'在读'"
     },
     {
       'title': '备注信息',
