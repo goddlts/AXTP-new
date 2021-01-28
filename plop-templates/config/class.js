@@ -57,7 +57,12 @@ module.exports = {
     {
       'title': '班级状态',
       'field': 'status',
-      'value': "'在读'"
+      'value': "'在读'",
+      'is_select': true,
+      'options': [
+        '在读',
+        '毕业'
+      ]
     },
     {
       'title': '备注信息',
