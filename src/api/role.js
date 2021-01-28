@@ -1,5 +1,16 @@
 import request from '@/utils/request'
 
+// 设置用户角色
+export function setRoleForUsers (roleId, userIds) {
+  return request({
+    url: `/role/${roleId}/userids`,
+    method: 'post',
+    data: {
+      uids: userIds
+    }
+  })
+}
+
 export function getList (params) {
   return request({
     url: '/role',

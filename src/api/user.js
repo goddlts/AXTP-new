@@ -22,3 +22,41 @@ export function logout () {
     method: 'get'
   })
 }
+
+export function getList (params) {
+  return request({
+    url: '/user',
+    method: 'get',
+    params
+  })
+}
+
+export function removeUser (id) {
+  return request({
+    url: `/user/${id}`,
+    method: 'delete'
+  })
+}
+
+export function addUser (data) {
+  return request({
+    url: `/user`,
+    method: 'post',
+    data
+  })
+}
+
+export function editUser (id, data) {
+  return request({
+    url: `/user/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+export function getUserById (id) {
+  return request({
+    url: `/user/${id}`,
+    method: 'get'
+  })
+}
