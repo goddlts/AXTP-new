@@ -22,23 +22,32 @@ module.exports = {
     {
       'title': '校区',
       'field': 'campus_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择校区'
     },
     {
       'title': '教室名称',
       'field': 'classroom_name',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入教室名称'
     },
     {
       'title': '教室容量',
       'field': 'count',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入教室容量'
     },
     {
       'title': '教室状态',
       'field': 'status',
-      'value': "'空闲'"
+      'value': "'空闲'",
+      'is_select': true,
+      'options': [
+        '空闲',
+        '使用',
+        '维修'
+      ]
     },
     {
       'title': '备注信息',

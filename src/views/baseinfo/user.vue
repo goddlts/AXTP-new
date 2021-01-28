@@ -18,7 +18,7 @@
           :value="item.id"
         />
       </el-select>
-      <el-select v-model="s_role_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区">
+      <el-select v-model="s_role_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择角色">
         <el-option
           v-for="item in s_roleList"
           :key="item.id"
@@ -119,7 +119,7 @@
         <el-form-item label="校区" prop="campus_id">
           <el-select v-model="form.campus_id" placeholder="请选择校区">
             <el-option
-              v-for="item in s_campusList"
+              v-for="item in campusList"
               :key="item.id"
               :label="item.name"
               :value="item.id"
@@ -129,7 +129,7 @@
         <el-form-item label="部门" prop="depart_id">
           <el-select v-model="form.depart_id" placeholder="请选择部门">
             <el-option
-              v-for="item in s_departList"
+              v-for="item in departList"
               :key="item.id"
               :label="item.depart_name"
               :value="item.id"
@@ -137,9 +137,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="角色" prop="role_id">
-          <el-select v-model="form.role_id" placeholder="请选择选择角色">
+          <el-select v-model="form.role_id" placeholder="请选择角色">
             <el-option
-              v-for="item in s_roleList"
+              v-for="item in roleList"
               :key="item.id"
               :label="item.role_name"
               :value="item.id"

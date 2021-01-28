@@ -2,12 +2,20 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-input v-model="searchValue" size="small" placeholder="请输入{{cname}}" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-select v-model="s_campus_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
+        <el-option
+          v-for="item in s_campusList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        />
+      </el-select>
+      <el-input v-model="s_classroom_name" size="small" placeholder="请输入教室" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
-        添加{{cname}}
+        添加教室
       </el-button>
     </div>
     <!-- 表格 -->
@@ -21,13 +29,26 @@
       highlight-current-row
     >
       <el-table-column align="center" label="#" width="50" type="index" />
-      {{#each table}}
-      <el-table-column label="{{title}}" align="center">
+      <el-table-column label="校区" align="center">
         <template slot-scope="scope">
-          \{{ scope.row.{{field}} }}
+          {{ scope.row.campus_name }}
         </template>
       </el-table-column>
-      {{/each}}
+      <el-table-column label="教室名称" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.classroom_name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="教室容量" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.count }}
+        </template>
+      </el-table-column>
+      <el-table-column label="教室状态" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.status }}
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
@@ -54,36 +75,37 @@
         :model="form"
         label-width="100px"
       >
-        {{#each dialog}}
-          {{#if is_id}}
-        <el-form-item label="{{title}}"{{#if rule}} prop="{{field}}"{{/if}}>
-          <el-select v-model="form.{{field}}" placeholder="请选择{{title}}">
-            <option label="请选择" :value="-1" />
+        <el-form-item label="校区" prop="campus_id">
+          <el-select v-model="form.campus_id" placeholder="请选择校区">
+            <el-option
+              v-for="item in campusList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
-          {{else if is_select}}
-        <el-form-item label="{{title}}"{{#if rule}} prop="{{field}}"{{/if}}>
-          <el-select v-model="form.{{field}}">
-            {{#each options}}
-            <el-option label="{{this}}" value="{{this}}" />
-            {{/each}}
+        <el-form-item label="教室名称" prop="classroom_name">
+          <el-input v-model="form.classroom_name" />
+        </el-form-item>
+        <el-form-item label="教室容量" prop="count">
+          <el-input v-model="form.count" />
+        </el-form-item>
+        <el-form-item label="教室状态">
+          <el-select v-model="form.status">
+            <el-option label="空闲" value="空闲" />
+            <el-option label="使用" value="使用" />
+            <el-option label="维修" value="维修" />
           </el-select>
         </el-form-item>
-          {{else if desc}}
-        <el-form-item label="{{title}}"{{#if rule}} prop="{{field}}"{{/if}}>
+        <el-form-item label="备注信息">
           <el-input
-            v-model="form.{{field}}"
+            v-model="form.desc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
           />
         </el-form-item>
-          {{else}}
-        <el-form-item label="{{title}}"{{#if rule}} prop="{{field}}"{{/if}}>
-          <el-input v-model="form.{{field}}" />
-        </el-form-item>
-{{/if}}
-{{/each}}
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -94,7 +116,8 @@
 </template>
 
 <script>
-import { getList, remove{{upperCase name}}, add{{upperCase name}}, edit{{upperCase name}}, get{{upperCase name}}ById } from '@/api/{{name}}'
+import { getList, removeClassroom, addClassroom, editClassroom, getClassroomById } from '@/api/classroom'
+import { getList as getCampuses } from '@/api/campus'
 
 export default {
   data () {
@@ -102,6 +125,12 @@ export default {
       list: [],
       listLoading: true,
       searchValue: '',
+      // 绑定搜索框的下拉框/搜索框数据
+      s_campus_id: '',
+      s_campusList: [],
+      s_classroom_name: '',
+      // 弹出对话框中的下拉框数据
+      campusList: [],
       // 分页数据
       pagenum: 1,
       pagesize: 10,
@@ -110,25 +139,29 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        {{#each dialog}}
-        {{!-- #compare 这个位置是用来判断是否生成, --}}
-        {{field}}: {{{value}}}{{#compare @index ../dialog.length}},{{/compare}}
-        {{/each}}
+        campus_id: '',
+        classroom_name: '',
+        count: '',
+        status: '空闲',
+        desc: ''
       },
       // rules
       rules: {
-        {{#each dialog}}
-          {{#if rule}}
-        {{{field}}}: [
-          { required: true, message: '{{{rule}}}', trigger: 'blur' }
+        campus_id: [
+          { required: true, message: '请选择校区', trigger: 'change' }
         ],
-          {{/if}}
-        {{/each}}
+        classroom_name: [
+          { required: true, message: '请输入教室名称', trigger: 'blur' }
+        ],
+        count: [
+          { required: true, message: '请输入教室容量', trigger: 'blur' }
+        ]
       }
     }
   },
   created () {
     this.fetchData()
+    this.loadSelect()
   },
   methods: {
     async fetchData () {
@@ -136,7 +169,10 @@ export default {
       const { data } = await getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
-        query: this.searchValue
+        query: JSON.stringify({
+          classroom_name: this.s_classroom_name,
+          campus_id: this.s_campus_id
+        })
       })
       this.list = data.items
       this.total = data.total
@@ -150,13 +186,13 @@ export default {
     // 点击打开添加对话框
     handleShowAddDialog () {
       this.dialogFormVisible = true
-      this.dialogTitle = '添加{{cname}}'
+      this.dialogTitle = '添加教室'
     },
     // 点击编辑按钮
     async handleShowEditDialog (id) {
       this.dialogFormVisible = true
-      this.dialogTitle = '修改{{cname}}'
-      const { data } = await get{{upperCase name}}ById(id)
+      this.dialogTitle = '修改教室'
+      const { data } = await getClassroomById(id)
       this.form = data
     },
     // 弹出框的确定按钮
@@ -167,10 +203,10 @@ export default {
         return
       }
 
-      if (this.dialogTitle === '添加{{cname}}') {
-        await add{{upperCase name}}(this.form)
-      } else if (this.dialogTitle === '修改{{cname}}') {
-        await edit{{upperCase name}}(this.form.id, this.form)
+      if (this.dialogTitle === '添加教室') {
+        await addClassroom(this.form)
+      } else if (this.dialogTitle === '修改教室') {
+        await editClassroom(this.form.id, this.form)
       }
       this.fetchData()
       this.$message({
@@ -191,12 +227,12 @@ export default {
     },
     // 删除
     async handleDelete (id) {
-      await this.$confirm('此操作将永久删除该{{cname}}, 是否继续?', '提示', {
+      await this.$confirm('此操作将永久删除该教室, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
-      await remove{{upperCase name}}(id)
+      await removeClassroom(id)
       this.$message({
         type: 'success',
         message: '删除成功'
@@ -207,7 +243,18 @@ export default {
       }
       this.fetchData()
     },
-    // 弹出框关闭之后重置表单
+    // 绑定下拉框数据
+    async loadSelect () {
+      // 绑定下拉框的数据，使用的接口处理不太好，使用的是支持分页的接口
+      // 绑定校区
+      const { data: data1 } = await getCampuses({
+        pagenum: 1,
+        pagesize: 1000
+      })
+      this.s_campusList = data1.items
+      this.campusList = data1.items
+    },
+    // 弹出框关闭之后
     handleDialogClosed () {
       this.$refs.ruleForm.resetFields()
     }

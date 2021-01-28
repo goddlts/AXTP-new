@@ -30,25 +30,29 @@ module.exports = {
     {
       'title': '校区',
       'field': 'campus_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择校区'
     },
     {
       'title': '班主任',
       'field': 'class_master_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择班主任'
     },
     {
       'title': '教室',
       'field': 'classroom_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择教室'
     },
     {
       'title': '班级名称',
       'field': 'class_name',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入班级名称'
     },
     {
       'title': '班级状态',
