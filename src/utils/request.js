@@ -43,8 +43,16 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
+    // http 协议的状态不成功的时候
+    if (response.status !== 200 && response.status !== 201) {
+      Message({
+        message: response.statusText || 'Error',
+        type: 'error',
+        duration: 5 * 1000
+      })
+      return Promise.reject(new Error(response.statusText || 'Error'))
+    }
     const res = response.data
-
     // if the custom code is not 200/201, it is judged as an error.
     if (res.meta.status !== 200 && res.meta.status !== 201) {
       Message({
