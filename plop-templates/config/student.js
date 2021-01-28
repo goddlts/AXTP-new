@@ -38,24 +38,28 @@ module.exports = {
     {
       'title': '校区',
       'field': 'campus_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择校区'
     },
     {
       'title': '班级',
       'field': 'class_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择班级'
     },
     {
       'title': '学号',
       'field': 'stu_no',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入学号'
     },
     {
       'title': '姓名',
       'field': 'name',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入姓名'
     },
     {
       'title': '性别',
@@ -81,7 +85,14 @@ module.exports = {
     {
       'title': '学生状态',
       'field': 'status',
-      'value': "'在读'"
+      'value': "'在读'",
+      'is_select': true,
+      'options': [
+        '在读',
+        '休学',
+        '转班',
+        '开除'
+      ]
     },
     {
       'title': '学历',
