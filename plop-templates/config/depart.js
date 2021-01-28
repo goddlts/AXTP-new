@@ -18,13 +18,17 @@ module.exports = {
     {
       'title': '部门主管',
       'field': 'depart_master_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      // 是否是id，是id的话，生成下拉框
+      'is_id': true,
+      // 开启表单验证
+      'rule': '请选择部门主管'
     },
     {
       'title': '部门名称',
       'field': 'depart_name',
       'value': "''",
+      'rule': '请输入部门名称'
     },
     {
       'title': '部门描述',
