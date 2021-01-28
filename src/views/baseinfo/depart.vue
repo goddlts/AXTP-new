@@ -109,6 +109,7 @@ export default {
         depart_name: '',
         desc: ''
       },
+      users: [],
       // rules
       rules: {
         depart_master_id: [

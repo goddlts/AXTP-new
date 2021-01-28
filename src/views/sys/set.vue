@@ -92,7 +92,7 @@
 <script>
 import { getList } from '@/api/user'
 import { getList as getCampuses } from '@/api/campus'
-import { getList as getDepartments } from '@/api/department'
+import { getList as getDepartments } from '@/api/depart'
 import { getList as getRoles, setRoleForUsers } from '@/api/role'
 
 export default {
@@ -106,10 +106,10 @@ export default {
       list: [],
       listLoading: true,
       // 绑定下拉框/搜索框数据
-      campus_id: -1,
-      depart_id: -1,
+      campus_id: '',
+      depart_id: '',
       fullname: '',
-      role_id: -1,
+      role_id: '',
       campusList: [],
       departList: [],
       roleList: [],
@@ -210,8 +210,5 @@ export default {
 }
 </script>
 
-<style scoped>
-.filter-item {
-  margin-right: 15px;
-}
+<style>
 </style>

@@ -38,35 +38,41 @@ module.exports = {
     {
       'title': '校区',
       'field': 'campus_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择校区'
     },
     {
       'title': '部门',
-      'field': 'department_id',
-      'value': -1,
-      'is_id': true
+      'field': 'depart_id',
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择部门'
     },
     {
       'title': '角色',
       'field': 'role_id',
-      'value': -1,
-      'is_id': true
+      'value': "''",
+      'is_id': true,
+      'rule': '请选择角色'
     },
     {
       'title': '工号',
       'field': 'user_no',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入工号'
     },
     {
       'title': '登录名',
       'field': 'username',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入登录名'
     },
     {
       'title': '真实姓名',
       'field': 'fullname',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入真实姓名'
     },
     {
       'title': '性别',
@@ -76,7 +82,8 @@ module.exports = {
     {
       'title': '手机号码',
       'field': 'mobile',
-      'value': "''"
+      'value': "''",
+      'rule': '请输入手机号码'
     },
     {
       'title': '电子邮箱',
