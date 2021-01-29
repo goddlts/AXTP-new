@@ -2,12 +2,33 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-input v-model="searchValue" size="small" placeholder="请输入学科" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-select v-model="s_course_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择所属学科">
+        <el-option
+          v-for="item in courseList"
+          :key="item.id"
+          :label="item.course_name"
+          :value="item.id"
+        />
+      </el-select>
+      <el-select v-model="s_book_master_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择书籍负责人">
+        <el-option
+          v-for="item in userList"
+          :key="item.id"
+          :label="item.fullname"
+          :value="item.id"
+        />
+      </el-select>
+      <el-input v-model="book_name" size="small" placeholder="请输入书籍" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
+    </div>
+    <div class="filter-container">
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
-        添加学科
+        添加书籍
+      </el-button>
+      <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
+        批量添加书籍
       </el-button>
     </div>
     <!-- 表格 -->
@@ -23,7 +44,12 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="学科名称" align="center">
         <template slot-scope="scope">
-          <router-link :to="'/subject/book?cid=' + scope.row.id">{{ scope.row.course_name }}</router-link>
+          {{ scope.row.course_name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="书籍名称" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.book_name }}
         </template>
       </el-table-column>
       <el-table-column label="版本" align="center">
@@ -36,9 +62,9 @@
           {{ scope.row.in_use }}
         </template>
       </el-table-column>
-      <el-table-column label="学科负责人" align="center">
+      <el-table-column label="书籍负责人" align="center">
         <template slot-scope="scope">
-          {{ scope.row.course_master }}
+          {{ scope.row.book_master }}
         </template>
       </el-table-column>
       <el-table-column label="班级数量" align="center">
@@ -46,9 +72,9 @@
           {{ scope.row.in_use_classs_num }}
         </template>
       </el-table-column>
-      <el-table-column label="书籍数量" align="center">
+      <el-table-column label="章数量" align="center">
         <template slot-scope="scope">
-          {{ scope.row.books_num }}
+          {{ scope.row.chapter_num }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" width="150">
@@ -77,8 +103,18 @@
         :model="form"
         label-width="120px"
       >
-        <el-form-item label="学科负责人" prop="course_master_id">
-          <el-select v-model="form.course_master_id" placeholder="请选择学科负责人">
+        <el-form-item label="所属学科" prop="course_id">
+          <el-select v-model="form.course_id" placeholder="请选择所属学科">
+            <el-option
+              v-for="item in courseList"
+              :key="item.id"
+              :label="item.course_name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="书籍负责人" prop="book_master_id">
+          <el-select v-model="form.book_master_id" placeholder="请选择书籍负责人">
             <el-option
               v-for="item in userList"
               :key="item.id"
@@ -87,8 +123,8 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="学科名称" prop="course_name">
-          <el-input v-model="form.course_name" />
+        <el-form-item label="书籍名称" prop="book_name">
+          <el-input v-model="form.book_name" />
         </el-form-item>
         <el-form-item label="版本" prop="version">
           <el-input v-model="form.version" />
@@ -117,17 +153,21 @@
 </template>
 
 <script>
-import { getList, removeCourse, addCourse, editCourse, getCourseById } from '@/api/course'
+import { getList, removeBook, addBook, editBook, getBookById } from '@/api/book'
 import { getList as getUsers } from '@/api/user'
+import { getList as getCourses } from '@/api/course'
 
 export default {
   data () {
     return {
       list: [],
       listLoading: true,
-      searchValue: '',
-      // 弹出框的选择框
+      // 搜索框下拉框
+      s_course_id: '',
+      courseList: [],
+      s_book_master_id: '',
       userList: [],
+      book_name: '',
       // 分页数据
       pagenum: 1,
       pagesize: 10,
@@ -136,19 +176,23 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        course_master_id: '',
-        course_name: '',
+        course_id: '',
+        book_master_id: '',
+        book_name: '',
         version: '',
         in_use: true,
         desc: ''
       },
       // rules
       rules: {
-        course_master_id: [
-          { required: true, message: '请选择学科负责人', trigger: 'blur' }
+        course_id: [
+          { required: true, message: '请选择所属学科', trigger: 'change' }
         ],
-        course_name: [
-          { required: true, message: '请输入学科名称', trigger: 'blur' }
+        book_master_id: [
+          { required: true, message: '请选择书籍负责人', trigger: 'change' }
+        ],
+        book_name: [
+          { required: true, message: '请输入书籍名称', trigger: 'blur' }
         ],
         version: [
           { required: true, message: '请输入版本', trigger: 'blur' }
@@ -157,6 +201,13 @@ export default {
     }
   },
   created () {
+    if (this.$route.query.cid) {
+      this.s_course_id = Number.parseInt(this.$route.query.cid)
+      // if (isNaN(this.s_course_id)) {
+      //   this.s_course_id = ''
+      // }
+    }
+    console.log(this.s_course_id)
     this.fetchData()
     this.loadSelect()
   },
@@ -180,13 +231,13 @@ export default {
     // 点击打开添加对话框
     handleShowAddDialog () {
       this.dialogFormVisible = true
-      this.dialogTitle = '添加学科'
+      this.dialogTitle = '添加书籍'
     },
     // 点击编辑按钮
     async handleShowEditDialog (id) {
       this.dialogFormVisible = true
-      this.dialogTitle = '修改学科'
-      const { data } = await getCourseById(id)
+      this.dialogTitle = '修改书籍'
+      const { data } = await getBookById(id)
       this.form = data
     },
     // 弹出框的确定按钮
@@ -197,10 +248,10 @@ export default {
         return
       }
 
-      if (this.dialogTitle === '添加学科') {
-        await addCourse(this.form)
-      } else if (this.dialogTitle === '修改学科') {
-        await editCourse(this.form.id, this.form)
+      if (this.dialogTitle === '添加书籍') {
+        await addBook(this.form)
+      } else if (this.dialogTitle === '修改书籍') {
+        await editBook(this.form.id, this.form)
       }
       this.fetchData()
       this.$message({
@@ -221,12 +272,12 @@ export default {
     },
     // 删除
     async handleDelete (id) {
-      await this.$confirm('此操作将永久删除该学科, 是否继续?', '提示', {
+      await this.$confirm('此操作将永久删除该书籍, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
-      await removeCourse(id)
+      await removeBook(id)
       this.$message({
         type: 'success',
         message: '删除成功'
@@ -241,10 +292,19 @@ export default {
     handleDialogClosed () {
       this.$refs.ruleForm.resetFields()
     },
-    // 下拉框数据
+    // 绑定下拉框
     async loadSelect () {
-      const { data } = await getUsers()
-      this.userList = data.items
+      const { data: data1 } = await getUsers({
+        pagenum: 1,
+        pagesize: 1000
+      })
+      this.userList = data1.items
+
+      const { data: data2 } = await getCourses({
+        pagenum: 1,
+        pagesize: 1000
+      })
+      this.courseList = data2.items
     }
   }
 }
