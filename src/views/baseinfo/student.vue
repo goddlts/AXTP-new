@@ -18,7 +18,7 @@
           :value="item.id"
         />
       </el-select>
-      <el-select v-model="s_status" style="width: 140px" size="small" class="filter-item" placeholder="请选择学生状态" @change="handleFilter">
+      <el-select v-model="s_status" style="width: 140px" size="small" class="filter-item" placeholder="请选择状态" @change="handleFilter">
         <el-option label="在读" value="在读" />
         <el-option label="休学" value="休学" />
         <el-option label="转班" value="转班" />
@@ -28,8 +28,13 @@
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
+    </div>
+    <div class="filter-container">
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
         添加学生
+      </el-button>
+      <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
+        批量导入学生
       </el-button>
     </div>
     <!-- 表格 -->

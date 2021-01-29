@@ -1,0 +1,207 @@
+{
+  "meta": {
+    "status": 200,
+    "msg": "j#NgIo"
+  },
+  "data": [
+    {
+      "id": 1,
+      "path": "/sys",
+      "component": "layout",
+      "name": "sys",
+      "order": 1,
+      "hidden": false,
+      "meta": {
+        "title": "权限管理",
+        "icon": "el-icon-s-management"
+      },
+      "children": [
+        {
+          "id": 11,
+          "path": "role",
+          "component": "views/sys/role",
+          "name": "role",
+          "order": 1,
+          "hidden": false,
+          "meta": {
+            "title": "角色管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 12,
+          "path": "menu",
+          "component": "views/sys/menu",
+          "name": "menu",
+          "order": 2,
+          "hidden": false,
+          "meta": {
+            "title": "菜单管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 13,
+          "parentId": 1,
+          "path": "set",
+          "component": "views/sys/set",
+          "name": "set",
+          "order": 3,
+          "hidden": false,
+          "meta": {
+            "title": "分配角色",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "path": "/baseinfo",
+      "component": "layout",
+      "name": "baseinfo",
+      "order": 2,
+      "hidden": false,
+      "meta": {
+        "title": "基础数据",
+        "icon": "el-icon-document"
+      },
+      "children": [
+        {
+          "id": 21,
+          "path": "/baseinfo/campus",
+          "component": "views/baseinfo/campus",
+          "name": "campusindex",
+          "order": 1,
+          "hidden": false,
+          "meta": {
+            "title": "校区管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 22,
+          "path": "/baseinfo/depart",
+          "component": "views/baseinfo/depart",
+          "name": "depart",
+          "order": 2,
+          "hidden": false,
+          "meta": {
+            "title": "部门管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 23,
+          "path": "/baseinfo/user",
+          "component": "views/baseinfo/user",
+          "name": "user",
+          "order": 3,
+          "hidden": false,
+          "meta": {
+            "title": "员工管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 24,
+          "path": "/baseinfo/class",
+          "component": "views/baseinfo/class",
+          "name": "class",
+          "order": 4,
+          "hidden": false,
+          "meta": {
+            "title": "班级管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 25,
+          "path": "/baseinfo/classroom",
+          "component": "views/baseinfo/classroom",
+          "name": "classroom",
+          "order": 5,
+          "hidden": false,
+          "meta": {
+            "title": "教室管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 26,
+          "path": "/baseinfo/student",
+          "component": "views/baseinfo/student",
+          "name": "student",
+          "order": 6,
+          "hidden": false,
+          "meta": {
+            "title": "学生管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "path": "/subject",
+      "component": "layout",
+      "name": "subject",
+      "order": 3,
+      "hidden": false,
+      "meta": {
+        "title": "课程管理",
+        "icon": "el-icon-s-data"
+      },
+      "children": [
+        {
+          "id": 31,
+          "path": "/subject/course",
+          "component": "views/subject/course",
+          "name": "course",
+          "order": 1,
+          "hidden": false,
+          "meta": {
+            "title": "学科管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 32,
+          "path": "/subject/book",
+          "component": "views/subject/book",
+          "name": "book",
+          "order": 2,
+          "hidden": false,
+          "meta": {
+            "title": "书籍管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 33,
+          "path": "/subject/chapter",
+          "component": "views/subject/chapter",
+          "name": "chapter",
+          "order": 3,
+          "hidden": false,
+          "meta": {
+            "title": "章节管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        }
+      ]
+    }
+  ]
+}
