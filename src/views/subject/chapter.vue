@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-select v-model="s_course_id" style="width: 160px" size="small" class="filter-item" placeholder="请选择所属学科" @change="loadBooks()">
+      <el-select v-model="s_course_id" style="width: 160px" size="small" class="filter-item" placeholder="请选择所属学科" @change="loadBooks">
         <el-option
           v-for="item in courseList"
           :key="item.id"
@@ -10,7 +10,7 @@
           :value="item.id"
         />
       </el-select>
-      <el-select v-model="s_book_id" style="width: 250px" size="small" class="filter-item" placeholder="请选择所属书籍">
+      <el-select v-model="s_book_id" style="width: 250px" size="small" class="filter-item" placeholder="请选择所属书籍" @change="handleFilter">
         <el-option
           v-for="item in s_bookList"
           :key="item.id"
@@ -336,6 +336,8 @@ export default {
         })
       })
       this.s_bookList = data.items
+
+      this.handleFilter()
     },
     async loadBooks1 (course_id) {
       const { data } = await getBooks({

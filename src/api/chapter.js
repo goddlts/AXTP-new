@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getFeedbacksByChapterId (cid) {
+  return request({
+    url: `/chapter/${cid}/feedback`,
+    method: 'get'
+  })
+}
+
 export function getList (params) {
   return request({
     url: '/chapter',

@@ -200,6 +200,19 @@
             "icon": "el-icon-menu"
           },
           "children": []
+        },
+        {
+          "id": 34,
+          "path": "/subject/feedback",
+          "component": "views/subject/feedback",
+          "name": "feedback-item",
+          "order": 4,
+          "hidden": false,
+          "meta": {
+            "title": "反馈条目",
+            "icon": "el-icon-menu"
+          },
+          "children": []
         }
       ]
     }
