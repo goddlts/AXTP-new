@@ -1,5 +1,59 @@
 import request from '@/utils/request'
 
+// 点到
+export function callTheRoll (id, data) {
+  return request({
+    url: `/student/${id}/calltheroll`,
+    method: 'post',
+    data
+  })
+}
+
+export function getStudentsInClass (cid, params) {
+  return request({
+    url: `/student/class/${cid}`,
+    method: 'get',
+    params
+  })
+}
+
+// 获取学生出勤率等各种数据
+export function getStudentDataInClass (cid, params) {
+  return request({
+    url: `/student/class/${cid}/data`,
+    method: 'get',
+    params
+  })
+}
+
+// 获取学生出勤详情
+// /student/:sid/attendance
+export function getStudentAttendance (sid, params) {
+  return request({
+    url: `/student/${sid}/attendance`,
+    method: 'get',
+    params
+  })
+}
+
+// 获取班级学生出勤
+export function getStudentAttendanceInClass (cid, params) {
+  return request({
+    url: `/student/class/${cid}/attendance`,
+    method: 'get',
+    params
+  })
+}
+
+// 班级学生作业提交
+export function getStudentSubmissionInClass (cid, params) {
+  return request({
+    url: `/student/class/${cid}/submission`,
+    method: 'get',
+    params
+  })
+}
+
 export function getList (params) {
   return request({
     url: '/student',

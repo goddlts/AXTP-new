@@ -267,6 +267,19 @@
             "icon": "el-icon-menu"
           },
           "children": []
+        },
+        {
+          "id": 52,
+          "path": "/tcenter/:id/calltheroll",
+          "component": "views/tcenter/class/calltheroll",
+          "name": "calltheroll",
+          "order": 2,
+          "hidden": true,
+          "meta": {
+            "title": "点名表",
+            "icon": "el-icon-menu"
+          },
+          "children": []
         }
       ]
     }
