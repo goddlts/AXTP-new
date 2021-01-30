@@ -7,6 +7,29 @@ export function getFeedbacksByChapterId (cid) {
   })
 }
 
+export function addFeedbackItems (cid, data) {
+  return request({
+    url: `/chapter/${cid}/feedback`,
+    method: 'post',
+    data
+  })
+}
+
+export function removeFeedback (id) {
+  return request({
+    url: `/feedback/${id}`,
+    method: 'delete'
+  })
+}
+
+export function editFeedback (id, data) {
+  return request({
+    url: `/feedback/${id}`,
+    method: 'put',
+    data
+  })
+}
+
 export function getList (params) {
   return request({
     url: '/chapter',
