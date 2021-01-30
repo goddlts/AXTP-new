@@ -258,12 +258,12 @@
         {
           "id": 51,
           "path": "/tcenter/class",
-          "component": "views/tcenter/class/index",
-          "name": "tcenterclass",
+          "component": "views/tcenter/class/attendance",
+          "name": "attendancelist",
           "order": 1,
           "hidden": false,
           "meta": {
-            "title": "班级管理",
+            "title": "出勤管理",
             "icon": "el-icon-menu"
           },
           "children": []
@@ -277,6 +277,19 @@
           "hidden": true,
           "meta": {
             "title": "点名表",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        },
+        {
+          "id": 53,
+          "path": "/tcenter/:id/attendance",
+          "component": "views/tcenter/class/attendancedetail",
+          "name": "attendancedetail",
+          "order": 3,
+          "hidden": true,
+          "meta": {
+            "title": "出勤详情",
             "icon": "el-icon-menu"
           },
           "children": []

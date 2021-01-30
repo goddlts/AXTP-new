@@ -24,57 +24,57 @@
       highlight-current-row
     >
       <el-table-column align="center" label="#" width="50" type="index" />
-      <el-table-column label="上课日期" align="center">
+      <el-table-column label="上课日期" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.dateforclass }}
         </template>
       </el-table-column>
-      <el-table-column label="上课时间" align="center">
+      <el-table-column label="上课时间" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.timeforclass }}
         </template>
       </el-table-column>
-      <el-table-column label="校区" align="center">
+      <el-table-column label="校区" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.campus_name }}
         </template>
       </el-table-column>
-      <el-table-column label="班级" align="center">
+      <el-table-column label="班级" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.class_name }}
         </template>
       </el-table-column>
-      <el-table-column label="年级" align="center">
+      <el-table-column label="年级" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.grade }}
         </template>
       </el-table-column>
-      <el-table-column label="教员" align="center">
+      <el-table-column label="教员" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.teacher }}
         </template>
       </el-table-column>
-      <el-table-column label="班主任" align="center">
+      <el-table-column label="班主任" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.class_master }}
         </template>
       </el-table-column>
-      <el-table-column label="教室" align="center">
+      <el-table-column label="教室" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.classroom_name }}
         </template>
       </el-table-column>
-      <el-table-column label="章" align="center">
+      <el-table-column label="章" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.chapter_name }}
         </template>
       </el-table-column>
-      <el-table-column label="书籍" align="center">
+      <el-table-column label="书籍" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.book_name }}
         </template>
       </el-table-column>
-      <el-table-column label="学科" align="center">
+      <el-table-column label="学科" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.course_name }}
         </template>

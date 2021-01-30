@@ -73,26 +73,10 @@
           <router-link :to="{ path: `/tc/${scope.row.id}/attendance` }">{{ scope.row.attendance_rate }}</router-link>
         </template>
       </el-table-column>
-      <el-table-column label="考试合格率" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pass_rate }}
-        </template>
-      </el-table-column>
-      <el-table-column label="作业提交率" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.submission_rate }}
-        </template>
-      </el-table-column>
-      <el-table-column label="答辩通过率" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.defense_pass_rate }}
-        </template>
-      </el-table-column>
       <el-table-column width="260" align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="mini" @click="$router.push(`/tcenter/${scope.row.id}/calltheroll`)">点名</el-button>
-          <el-button type="text" size="mini" @click="$router.push(`/tcenter/${scope.row.id}/submission`)">作业提交</el-button>
-          <el-button type="text" size="mini" @click="$router.push(`/tcenter/${scope.row.id}/details`)">详情</el-button>
+          <el-button type="text" size="mini" @click="$router.push(`/tcenter/${scope.row.id}/attendance`)">详情</el-button>
           <el-button type="text" size="mini">导出</el-button>
         </template>
       </el-table-column>
