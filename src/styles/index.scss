@@ -74,3 +74,11 @@ div:focus {
     margin-right: 15px;
   }
 }
+
+.el-date-editor {
+  .el-range-input, .el-range-separator {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 20px;
+  }
+}

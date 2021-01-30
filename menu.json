@@ -258,7 +258,7 @@
         {
           "id": 51,
           "path": "/tcenter/class",
-          "component": "views/tcenter/class",
+          "component": "views/tcenter/class/index",
           "name": "tcenterclass",
           "order": 1,
           "hidden": false,

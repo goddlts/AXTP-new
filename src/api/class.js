@@ -1,5 +1,14 @@
 import request from '@/utils/request'
 
+// 获取班级的数据统计
+export function getClassData (params) {
+  return request({
+    url: '/classdata',
+    method: 'get',
+    params
+  })
+}
+
 export function getList (params) {
   return request({
     url: '/class',
