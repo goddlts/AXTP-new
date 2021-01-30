@@ -215,6 +215,60 @@
           "children": []
         }
       ]
+    },
+    {
+      "id": 4,
+      "path": "/eacenter",
+      "component": "layout",
+      "name": "eacenter",
+      "order": 4,
+      "hidden": false,
+      "meta": {
+        "title": "教务中心",
+        "icon": "el-icon-s-order"
+      },
+      "children": [
+        {
+          "id": 41,
+          "path": "/eacenter/schedule",
+          "component": "views/eacenter/schedule",
+          "name": "schedule",
+          "order": 1,
+          "hidden": false,
+          "meta": {
+            "title": "教务排课",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "path": "/tcenter",
+      "component": "layout",
+      "name": "tcenter",
+      "order": 5,
+      "hidden": false,
+      "meta": {
+        "title": "教学中心",
+        "icon": "el-icon-s-platform"
+      },
+      "children": [
+        {
+          "id": 51,
+          "path": "/tcenter/class",
+          "component": "views/tcenter/class",
+          "name": "tcenterclass",
+          "order": 1,
+          "hidden": false,
+          "meta": {
+            "title": "班级管理",
+            "icon": "el-icon-menu"
+          },
+          "children": []
+        }
+      ]
     }
   ]
 }
