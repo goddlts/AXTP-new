@@ -2,15 +2,15 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-select v-model="s_campus_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
+      <el-select v-model="s_campus_name" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
         <el-option
           v-for="item in s_campusList"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id"
+          :key="item.campusId"
+          :label="item.campusName"
+          :value="item.campusName"
         />
       </el-select>
-      <el-select v-model="s_class_master_id" filterable style="width: 140px" size="small" class="filter-item" placeholder="请选择班主任" @change="handleFilter">
+      <el-select v-model="s_class_master" filterable style="width: 140px" size="small" class="filter-item" placeholder="请选择班主任" @change="handleFilter">
         <el-option
           v-for="item in s_userList"
           :key="item.id"
@@ -19,9 +19,9 @@
         />
       </el-select>
       <el-select v-model="s_grade" style="width: 140px" size="small" class="filter-item" placeholder="请选择年级">
-        <el-option label="S1" value="S1" />
-        <el-option label="S2" value="S2" />
-        <el-option label="Y2" value="Y2" />
+        <el-option label="初级" value="初级" />
+        <el-option label="中级" value="中级" />
+        <el-option label="高级" value="高级" />
       </el-select>
       <el-input v-model="s_class_name" size="small" placeholder="请输入班级" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
@@ -44,49 +44,49 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="校区" align="center">
         <template slot-scope="scope">
-          {{ scope.row.campus_name }}
+          {{ scope.row.campusName }}
         </template>
       </el-table-column>
       <el-table-column label="班级名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.class_name }}
+          {{ scope.row.className }}
         </template>
       </el-table-column>
       <el-table-column label="年级" align="center">
         <template slot-scope="scope">
-          {{ scope.row.grade }}
+          {{ scope.row.classGrade }}
         </template>
       </el-table-column>
       <el-table-column label="班主任" align="center">
         <template slot-scope="scope">
-          {{ scope.row.class_master }}
+          {{ scope.row.classMaster }}
         </template>
       </el-table-column>
       <el-table-column label="班级人数" align="center">
         <template slot-scope="scope">
-          {{ scope.row.students_count }}
+          {{ scope.row.classCount }}
         </template>
       </el-table-column>
       <el-table-column label="班级状态" align="center">
         <template slot-scope="scope">
-          {{ scope.row.status }}
+          {{ scope.row.classStatus }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
-          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
+          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.classId)">编辑</el-button>
+          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.classId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="1"
+      :current-page="pagenum"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
+      :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -98,48 +98,59 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="校区" prop="campus_id">
-          <el-select v-model="form.campus_id" placeholder="请选择校区">
+        <el-form-item label="校区" prop="campusName">
+          <el-select v-model="form.campusName" placeholder="请选择校区">
             <el-option
               v-for="item in campusList"
               :key="item.id"
-              :label="item.name"
-              :value="item.id"
+              :label="item.campusName"
+              :value="item.campusName"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="班主任" prop="class_master_id">
-          <el-select v-model="form.class_master_id" placeholder="请选择班主任">
+        <el-form-item label="班主任" prop="classMaster">
+          <el-select v-model="form.classMaster" placeholder="请选择班主任">
             <el-option
               v-for="item in userList"
               :key="item.id"
               :label="item.fullname"
-              :value="item.id"
+              :value="item.fullname"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="教室" prop="classroom_id">
-          <el-select v-model="form.classroom_id" placeholder="请选择教室">
+        <el-form-item label="年级" prop="classGrade">
+          <el-select v-model="form.classGrade" placeholder="请选择年级">
+            <el-option label="初级" value="初级" />
+            <el-option label="中级" value="中级" />
+            <el-option label="高级" value="高级" />
+          </el-select>
+         </el-form-item>
+        <el-form-item label="教室" prop="classroomName">
+          <el-select v-model="form.classroomName" placeholder="请选择教室">
             <el-option
               v-for="item in classroomList"
               :key="item.id"
-              :label="item.classroom_name"
-              :value="item.id"
+              :label="item.classroomName"
+              :value="item.classroomName"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="班级名称" prop="class_name">
-          <el-input v-model="form.class_name" />
+
+        <el-form-item label="班级名称" prop="className">
+          <el-input v-model="form.className" />
+        </el-form-item>
+        <el-form-item label="班级人数">
+          <el-input v-model="form.classCount" />
         </el-form-item>
         <el-form-item label="班级状态">
-          <el-select v-model="form.status">
+          <el-select v-model="form.classStatus">
             <el-option label="在读" value="在读" />
             <el-option label="毕业" value="毕业" />
           </el-select>
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="form.desc"
+            v-model="form.classDesc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -166,8 +177,8 @@ export default {
       list: [],
       listLoading: true,
       // 搜索框数据
-      s_campus_id: '',
-      s_class_master_id: '',
+      s_campus_name: '',
+      s_class_master: '',
       s_grade: '',
       s_class_name: '',
       s_campusList: [],
@@ -184,25 +195,30 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        campus_id: '',
-        class_master_id: '',
-        classroom_id: '',
-        class_name: '',
-        status: '在读',
-        desc: ''
+        campusName: '',
+        classMaster: '',
+        classroomName: '',
+        className: '',
+        classCount: '',
+        classStatus: '在读',
+        classDesc: '',
+        classGrade: ''
       },
       // rules
       rules: {
-        campus_id: [
+        campusName: [
           { required: true, message: '请选择校区', trigger: 'blur' }
         ],
-        class_master_id: [
+        classGrade: [
+          { required: true, message: '请选择年级', trigger: 'blur' }
+        ],
+        classMaster: [
           { required: true, message: '请选择班主任', trigger: 'blur' }
         ],
-        classroom_id: [
+        classroomName: [
           { required: true, message: '请选择教室', trigger: 'blur' }
         ],
-        class_name: [
+        className: [
           { required: true, message: '请输入班级名称', trigger: 'blur' }
         ]
       }
@@ -218,7 +234,13 @@ export default {
       const { data } = await getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
-        query: this.searchValue
+        query: {
+          campusName: this.s_campus_name,
+          classMaster: this.s_class_master,
+          classGrade: this.s_grade,
+          className: this.s_class_name
+          // this.searchValue
+        }
       })
       this.list = data.items
       this.total = data.total
@@ -252,7 +274,7 @@ export default {
       if (this.dialogTitle === '添加班级') {
         await addClass(this.form)
       } else if (this.dialogTitle === '修改班级') {
-        await editClass(this.form.id, this.form)
+        await editClass(this.form.classId, this.form)
       }
       this.fetchData()
       this.$message({
