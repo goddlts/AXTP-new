@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-input v-model="searchValue" size="small" placeholder="请输入教室" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="searchValue" size="small" placeholder="请输入" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -217,7 +217,7 @@ export default {
           { required: true, message: '请选择教室', trigger: 'blur' }
         ],
         dateforclass: [
-          { required: true, message: '请输入上课时间', trigger: 'blur' }
+          { required: true, message: '请输入上课日期', trigger: 'blur' }
         ],
         timeforclass: [
           { required: true, message: '请输入上课时间', trigger: 'blur' }
@@ -248,12 +248,12 @@ export default {
     // 点击打开添加对话框
     handleShowAddDialog () {
       this.dialogFormVisible = true
-      this.dialogTitle = '添加教室'
+      this.dialogTitle = '排课'
     },
     // 点击编辑按钮
     async handleShowEditDialog (id) {
       this.dialogFormVisible = true
-      this.dialogTitle = '修改教室'
+      this.dialogTitle = '编辑课表'
       const { data } = await getScheduleById(id)
       this.form = data
     },

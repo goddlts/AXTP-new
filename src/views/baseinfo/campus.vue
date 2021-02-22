@@ -23,22 +23,17 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="校区名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.name }}
+          {{ scope.row.campusName }}
         </template>
       </el-table-column>
       <el-table-column label="负责人" align="center">
         <template slot-scope="scope">
-          {{ scope.row.campus_master }}
-        </template>
-      </el-table-column>
-      <el-table-column label="班级数量" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.class_count }}
+          {{ scope.row.campusMasterName }}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center">
         <template slot-scope="scope">
-          {{ scope.row.created_time }}
+          {{ scope.row.createdTime }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
@@ -51,11 +46,11 @@
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="1"
+      :current-page="pagenum"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
+      :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -67,17 +62,17 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="负责人" prop="campus_master_id">
-          <el-select v-model="form.campus_master_id" filterable placeholder="请选择负责人">
-            <el-option v-for="item in users" :key="item.id" :label="item.fullname" :value="item.id" />
+        <el-form-item label="负责人" prop="campusMasterName">
+          <el-select v-model="form.campusMasterName" filterable placeholder="请选择负责人">
+            <el-option v-for="item in users" :key="item.id" :label="item.fullname" :value="item.fullname" />
           </el-select>
         </el-form-item>
-        <el-form-item label="校区名称" prop="name">
-          <el-input v-model="form.name" />
+        <el-form-item label="校区名称" prop="campusName">
+          <el-input v-model="form.campusName" />
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="form.desc"
+            v-model="form.desca"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -110,19 +105,19 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        campus_master_id: '',
-        name: '',
-        desc: ''
+        campusMasterName: '',
+        campusName: '',
+        desca: ''
       },
       // 下拉框数据
       users: [],
       // 表单验证数据
       rules: {
-        campus_master_id: [
-          { required: true, message: '请选择负责人', trigger: 'change' }
-        ],
-        name: [
+        campusName: [
           { required: true, message: '请输入校区名称', trigger: 'blur' }
+        ],
+        campusMasterName: [
+          { required: true, message: '请输入校区负责人', trigger: 'blur' }
         ]
       }
     }
@@ -138,7 +133,9 @@ export default {
       const { data } = await getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
-        query: this.searchValue
+        query: {
+          campusName: this.searchValue
+        }
       })
       this.list = data.items
       this.total = data.total
@@ -160,7 +157,6 @@ export default {
       this.dialogTitle = '修改校区'
       const { data } = await getCampusById(id)
       this.form = data
-      console.log(this.form)
     },
     // 弹出框的确定按钮
     async handleSure () {
@@ -214,7 +210,8 @@ export default {
     async loadUser () {
       const { data } = await getUsers({
         pagenum: 1,
-        pagesize: 1000
+        pagesize: 1000,
+        query: {}
       })
       this.users = data.items
     }

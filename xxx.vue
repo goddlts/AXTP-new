@@ -2,15 +2,15 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-select v-model="s_campusName" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
+      <el-select v-model="s_campusId" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
         <el-option
           v-for="item in s_campusList"
           :key="item.id"
-          :label="item.campusName"
-          :value="item.campusName"
+          :label="item.name"
+          :value="item.name"
         />
       </el-select>
-      <el-select v-model="s_departName" style="width: 140px" size="small" class="filter-item" placeholder="请选择部门" @change="handleFilter">
+      <el-select v-model="s_departId" style="width: 140px" size="small" class="filter-item" placeholder="请选择部门" @change="handleFilter">
         <el-option
           v-for="item in s_departList"
           :key="item.id"
@@ -18,7 +18,7 @@
           :value="item.departName"
         />
       </el-select>
-      <el-select v-model="s_roleName" style="width: 140px" size="small" class="filter-item" placeholder="请选择角色">
+      <el-select v-model="s_roleId" style="width: 140px" size="small" class="filter-item" placeholder="请选择角色">
         <el-option
           v-for="item in s_roleList"
           :key="item.id"
@@ -31,25 +31,13 @@
         搜索
       </el-button>
     </div>
-
     <div class="filter-container">
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
         添加员工
       </el-button>
-      <el-upload
-        style="display: inline-block"
-        action="http://192.168.15.153:8080/renren-fast/api/upload/user"
-        accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        :headers="{
-          token: token
-        }"
-        :show-file-list="false"
-        :on-success="handleUploadSuccess"
-        :file-list="fileList"
-      >
-        <el-button size="small" type="primary" class="filter-item" icon="el-icon-plus">批量导入员工</el-button>
-      </el-upload>
-      <el-button size="small" type="primary" class="filter-item" icon="el-icon-minus" @click="handleDeleteMultiple">批量删除员工</el-button>
+      <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
+        批量导入员工
+      </el-button>
     </div>
     <!-- 表格 -->
     <el-table
@@ -60,15 +48,9 @@
       stripe
       fit
       highlight-current-row
-      @selection-change="handleSelectionChange"
     >
-      <el-table-column
-        type="selection"
-        align="center"
-        width="40"
-      />
-      <!-- <el-table-column align="center" label="#" width="50" type="index" /> -->
-      <el-table-column label="员工姓名" width="80" align="center">
+      <el-table-column align="center" label="#" width="50" type="index" />
+      <el-table-column label="员工姓名" align="center">
         <template slot-scope="scope">
           {{ scope.row.fullname }}
         </template>
@@ -95,7 +77,7 @@
       </el-table-column>
       <el-table-column label="年龄" align="center">
         <template slot-scope="scope">
-          {{ getAge(scope.row.birthday) }}
+          {{ scope.row.age }}
         </template>
       </el-table-column>
       <el-table-column label="电话" align="center">
@@ -134,33 +116,33 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="校区" prop="campusName">
-          <el-select v-model="form.campusName" placeholder="请选择校区">
+        <el-form-item label="校区" prop="campusId">
+          <el-select v-model="form.campusId" placeholder="请选择校区">
             <el-option
               v-for="item in campusList"
               :key="item.id"
               :label="item.campusName"
-              :value="item.campusName"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="部门" prop="departName">
-          <el-select v-model="form.departName" placeholder="请选择部门">
+        <el-form-item label="部门" prop="departId">
+          <el-select v-model="form.departId" placeholder="请选择部门">
             <el-option
               v-for="item in departList"
               :key="item.id"
               :label="item.departName"
-              :value="item.departName"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="角色" prop="roleName">
-          <el-select v-model="form.roleName" placeholder="请选择角色">
+        <el-form-item label="角色" prop="roleId">
+          <el-select v-model="form.roleId" placeholder="请选择角色">
             <el-option
               v-for="item in roleList"
               :key="item.id"
               :label="item.roleName"
-              :value="item.roleName"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -186,17 +168,10 @@
           <el-input v-model="form.email" />
         </el-form-item>
         <el-form-item label="出生日期">
-          <el-date-picker
-            v-model="form.birthday"
-            style="width: 200px"
-            align="right"
-            type="date"
-            placeholder="请选择出生日期"
-            :picker-options="pickerOptions"
-          />
+          <el-input v-model="form.birthday" />
         </el-form-item>
         <el-form-item label="员工状态">
-          <el-select v-model="form.statusa" style="width: 200px">
+          <el-select v-model="form.statusa">
             <el-option label="在职" value="在职" />
             <el-option label="离职" value="离职" />
           </el-select>
@@ -228,36 +203,27 @@
 </template>
 
 <script>
-import { getList, removeUser, addUser, editUser, getUserById, removeMultiplyUser } from '@/api/user'
+import { getList, removeUser, addUser, editUser, getUserById } from '@/api/user'
 import { getList as getCampuses } from '@/api/campus'
 import { getList as getDepartments } from '@/api/depart'
 import { getList as getRoles } from '@/api/role'
-import { getToken } from '@/utils/auth'
 
 export default {
   data () {
     return {
-      token: getToken(),
-      pickerOptions: {
-        disabledDate (time) {
-          return time.getTime() > Date.now()
-        }
-      },
-      // 文件上传
-      fileList: [],
       list: [],
       listLoading: true,
       // 绑定搜索框的下拉框/搜索框数据
-      s_campusName: '',
-      s_departName: '',
+      s_campusId: '',
+      s_departId: '',
       s_fullname: '',
-      s_roleName: '',
+      s_roleId: '',
       s_campusList: [],
       s_departList: [],
       s_roleList: [],
       // 绑定表单中的下拉框
-      campusName: '',
-      departName: '',
+      campusId: '',
+      departId: '',
       fullname: '',
       campusList: [],
       departList: [],
@@ -270,9 +236,9 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        campusName: '',
-        departName: '',
-        roleName: '',
+        campusId: '',
+        departId: '',
+        roleId: '',
         userNo: '',
         username: '',
         fullname: '',
@@ -288,13 +254,13 @@ export default {
       },
       // rules
       rules: {
-        campusName: [
+        campusId: [
           { required: true, message: '请选择校区', trigger: 'change' }
         ],
-        departName: [
+        departId: [
           { required: true, message: '请选择部门', trigger: 'change' }
         ],
-        roleName: [
+        roleId: [
           { required: true, message: '请选择角色', trigger: 'change' }
         ],
         userNo: [
@@ -309,9 +275,7 @@ export default {
         mobile: [
           { required: true, message: '请输入手机号码', trigger: 'blur' }
         ]
-      },
-      // 获取选中的行
-      multipleSelection: []
+      }
     }
   },
   created () {
@@ -325,9 +289,9 @@ export default {
         pagenum: this.pagenum,
         pagesize: this.pagesize,
         query: JSON.stringify({
-          campusName: this.s_campusName,
-          departName: this.s_departName,
-          roleName: this.s_roleName,
+          campusId: this.s_campusId,
+          departId: this.s_departId,
+          roleId: this.s_roleId,
           fullname: this.s_fullname
         })
       })
@@ -428,51 +392,6 @@ export default {
     // 弹出框关闭之后
     handleDialogClosed () {
       this.$refs.ruleForm.resetFields()
-    },
-    handleUploadSuccess (res) {
-      this.pagenum = 1
-      this.fetchData()
-      this.$message({
-        type: 'success',
-        message: `批量上传成功，已添加 ${res.data.count} 个员工`
-      })
-    },
-    // 单选框发生改变的时候执行(批量删除使用)
-    handleSelectionChange (rows) {
-      // rows 当前选中的行
-      this.multipleSelection = rows
-    },
-    // 批量删除
-    async handleDeleteMultiple () {
-      if (this.multipleSelection.length <= 0) {
-        return this.$message({
-          type: 'warning',
-          message: '请选择要删除的员工'
-        })
-      }
-      await this.$confirm('此操作将永久删除员工, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      const ids = this.multipleSelection.map(row => {
-        return row.id
-      })
-      const count = ids.length
-      await removeMultiplyUser(ids.splice(','))
-      this.$message({
-        type: 'success',
-        message: `已删除${count}条员工数据`
-      })
-      this.fetchData()
-    },
-    // 获取年龄
-    getAge (birthday) {
-      const age = new Date().getFullYear() - new Date(birthday).getFullYear()
-      if (isNaN(age)) {
-        return '-'
-      }
-      return age
     }
   }
 }

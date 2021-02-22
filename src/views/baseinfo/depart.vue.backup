@@ -23,17 +23,17 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="部门名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.departName }}
+          {{ scope.row.depart_name }}
         </template>
       </el-table-column>
       <el-table-column label="部门主管" align="center">
         <template slot-scope="scope">
-          {{ scope.row.departMaster }}
+          {{ scope.row.depart_master }}
         </template>
       </el-table-column>
       <el-table-column label="部门人数" align="center">
         <template slot-scope="scope">
-          {{ scope.row.departCount }}
+          {{ scope.row.depart_count }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
@@ -46,11 +46,11 @@
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="pagenum"
+      :current-page="1"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="pagesize"
+      :page-size="8"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
+      :total="400"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -62,17 +62,17 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="部门主管" prop="departMaster">
-          <el-select v-model="form.departMaster" filterable placeholder="请选择负责人">
-            <el-option v-for="item in users" :key="item.id" :label="item.fullname" :value="item.fullname" />
+        <el-form-item label="部门主管" prop="depart_master_id">
+          <el-select v-model="form.depart_master_id" filterable placeholder="请选择负责人">
+            <el-option v-for="item in users" :key="item.id" :label="item.fullname" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="部门名称" prop="departName">
-          <el-input v-model="form.departName" />
+        <el-form-item label="部门名称" prop="depart_name">
+          <el-input v-model="form.depart_name" />
         </el-form-item>
         <el-form-item label="部门描述">
           <el-input
-            v-model="form.desca"
+            v-model="form.desc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -105,17 +105,17 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        departMaster: '',
-        departName: '',
-        desca: ''
+        depart_master_id: '',
+        depart_name: '',
+        desc: ''
       },
       users: [],
       // rules
       rules: {
-        departMaster: [
+        depart_master_id: [
           { required: true, message: '请选择部门主管', trigger: 'blur' }
         ],
-        departName: [
+        depart_name: [
           { required: true, message: '请输入部门名称', trigger: 'blur' }
         ]
       }
@@ -131,9 +131,7 @@ export default {
       const { data } = await getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
-        query: {
-          departName: this.searchValue
-        }
+        query: this.searchValue
       })
       this.list = data.items
       this.total = data.total

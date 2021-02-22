@@ -7,6 +7,7 @@
           日期：
           <el-date-picker
             v-model="dateValue"
+            style="width: 200px"
             class="filter-item"
             size="mini"
             align="right"
@@ -15,7 +16,7 @@
             :picker-options="pickerOptions"
           /><br>
           时间：
-          <el-select v-model="timeValue" class="filter-item" size="mini" placeholder="请选择">
+          <el-select v-model="timeValue" style="width: 200px" class="filter-item" size="mini" placeholder="请选择">
             <el-option
               label="上午"
               value="上午"

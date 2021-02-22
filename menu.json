@@ -257,8 +257,8 @@
       "children": [
         {
           "id": 51,
-          "path": "/tcenter/class",
-          "component": "views/tcenter/class/attendance",
+          "path": "/tcenter/attendance",
+          "component": "views/tcenter/attendance/attendance",
           "name": "attendancelist",
           "order": 1,
           "hidden": false,
@@ -271,28 +271,53 @@
         {
           "id": 52,
           "path": "/tcenter/:id/calltheroll",
-          "component": "views/tcenter/class/calltheroll",
+          "component": "views/tcenter/attendance/calltheroll",
           "name": "calltheroll",
           "order": 2,
           "hidden": true,
           "meta": {
             "title": "点名表",
-            "icon": "el-icon-menu"
-          },
-          "children": []
+            "icon": "el-icon-menu",
+            "activeMenu": "/tcenter/attendance"
+          }
         },
         {
           "id": 53,
           "path": "/tcenter/:id/attendance",
-          "component": "views/tcenter/class/attendancedetail",
+          "component": "views/tcenter/attendance/attendancedetail",
           "name": "attendancedetail",
           "order": 3,
           "hidden": true,
           "meta": {
             "title": "出勤详情",
+            "icon": "el-icon-menu",
+            "activeMenu": "/tcenter/attendance"
+          }
+        },
+        {
+          "id": 54,
+          "path": "/tcenter/exam",
+          "component": "views/tcenter/exam/index",
+          "name": "examlist",
+          "order": 4,
+          "hidden": false,
+          "meta": {
+            "title": "考试管理",
             "icon": "el-icon-menu"
-          },
-          "children": []
+          }
+        },
+        {
+          "id": 55,
+          "path": "/tcenter/exam/inputscore/:examid/:classid",
+          "component": "views/tcenter/exam/inputscore",
+          "name": "examinputscore",
+          "order": 5,
+          "hidden": true,
+          "meta": {
+            "title": "录入成绩",
+            "icon": "el-icon-menu",
+            "activeMenu": "/tcenter/exam"
+          }
         }
       ]
     }
