@@ -15,7 +15,7 @@
           v-for="item in s_userList"
           :key="item.id"
           :label="item.fullname"
-          :value="item.id"
+          :value="item.fullname"
         />
       </el-select>
       <el-select v-model="s_grade" style="width: 140px" size="small" class="filter-item" placeholder="请选择年级">

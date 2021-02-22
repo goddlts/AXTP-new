@@ -56,7 +56,8 @@ export function getStudentSubmissionInClass (cid, params) {
 
 export function getList (params) {
   return request({
-    url: '/student',
+    // url: '/student',
+    url: 'http://192.168.15.153:8080/renren-fast/api/student',
     method: 'get',
     params
   })
@@ -64,14 +65,16 @@ export function getList (params) {
 
 export function removeStudent (id) {
   return request({
-    url: `/student/${id}`,
+    // url: `/student/${id}`,
+    url: `http://192.168.15.153:8080/renren-fast/api/student/${id}`,
     method: 'delete'
   })
 }
 
 export function addStudent (data) {
   return request({
-    url: `/student`,
+    // url: `/student`,
+    url: 'http://192.168.15.153:8080/renren-fast/api/student',
     method: 'post',
     data
   })
@@ -79,7 +82,8 @@ export function addStudent (data) {
 
 export function editStudent (id, data) {
   return request({
-    url: `/student/${id}`,
+    // url: `/student/${id}`,
+    url: `http://192.168.15.153:8080/renren-fast/api/student/${id}`,
     method: 'put',
     data
   })
@@ -87,7 +91,8 @@ export function editStudent (id, data) {
 
 export function getStudentById (id) {
   return request({
-    url: `/student/${id}`,
+    // url: `/student/${id}`,
+    url: `http://192.168.15.153:8080/renren-fast/api/student/${id}`,
     method: 'get'
   })
 }

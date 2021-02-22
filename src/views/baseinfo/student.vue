@@ -2,20 +2,20 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-select v-model="s_campus_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
+      <el-select v-model="s_campus_name" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
         <el-option
           v-for="item in s_campusList"
           :key="item.id"
-          :label="item.name"
-          :value="item.id"
+          :label="item.campusName"
+          :value="item.campusName"
         />
       </el-select>
-      <el-select v-model="s_class_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择班级" @change="handleFilter">
+      <el-select v-model="s_class_name" style="width: 140px" size="small" class="filter-item" placeholder="请选择班级" @change="handleFilter">
         <el-option
           v-for="item in s_classList"
           :key="item.id"
-          :label="item.class_name"
-          :value="item.id"
+          :label="item.className"
+          :value="item.className"
         />
       </el-select>
       <el-select v-model="s_status" style="width: 140px" size="small" class="filter-item" placeholder="请选择状态" @change="handleFilter">
@@ -50,59 +50,59 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="学号" align="center">
         <template slot-scope="scope">
-          {{ scope.row.stu_no }}
+          {{ scope.row.stuNo }}
         </template>
       </el-table-column>
       <el-table-column label="学生姓名" align="center">
         <template slot-scope="scope">
-          {{ scope.row.name }}
+          {{ scope.row.stuName }}
         </template>
       </el-table-column>
       <el-table-column label="校区" align="center">
         <template slot-scope="scope">
-          {{ scope.row.campus_name }}
+          {{ scope.row.campusName }}
         </template>
       </el-table-column>
       <el-table-column label="班级" align="center">
         <template slot-scope="scope">
-          {{ scope.row.class_name }}
+          {{ scope.row.className }}
         </template>
       </el-table-column>
       <el-table-column label="性别" align="center">
         <template slot-scope="scope">
-          {{ scope.row.sex }}
+          {{ scope.row.stuSex }}
         </template>
       </el-table-column>
       <el-table-column label="年龄" align="center">
         <template slot-scope="scope">
-          {{ scope.row.age }}
+          {{ getAge(scope.row.stuBirthday) }}
         </template>
       </el-table-column>
       <el-table-column label="电话" align="center">
         <template slot-scope="scope">
-          {{ scope.row.mobile }}
+          {{ scope.row.stuMobile }}
         </template>
       </el-table-column>
       <el-table-column label="学生状态" align="center">
         <template slot-scope="scope">
-          {{ scope.row.status }}
+          {{ scope.row.stuStatus }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" width="150">
         <template slot-scope="scope">
-          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
-          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
+          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.studentId)">编辑</el-button>
+          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.studentId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="1"
+      :current-page="pagenum"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
+      :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -115,52 +115,52 @@
         label-width="100px"
       >
         <el-form-item label="校区" prop="campus_id">
-          <el-select v-model="form.campus_id" placeholder="请选择校区">
+          <el-select v-model="form.campusName" placeholder="请选择校区">
             <el-option
               v-for="item in campusList"
               :key="item.id"
-              :label="item.name"
-              :value="item.id"
+              :label="item.campusName"
+              :value="item.campusName"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="班级" prop="class_id">
-          <el-select v-model="form.class_id" placeholder="请选择班级">
+        <el-form-item label="班级" prop="className">
+          <el-select v-model="form.className" placeholder="请选择班级">
             <el-option
               v-for="item in classList"
               :key="item.id"
-              :label="item.class_name"
-              :value="item.id"
+              :label="item.className"
+              :value="item.className"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="学号" prop="stu_no">
-          <el-input v-model="form.stu_no" />
+        <el-form-item label="学号" prop="stuNo">
+          <el-input v-model="form.stuNo" />
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="form.name" />
+        <el-form-item label="姓名" prop="stuName">
+          <el-input v-model="form.stuName" />
         </el-form-item>
         <el-form-item label="性别">
-          <el-radio-group v-model="form.sex">
+          <el-radio-group v-model="form.stuSex">
             <el-radio label="男">男</el-radio>
             <el-radio label="女">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="手机号码">
-          <el-input v-model="form.mobile" />
+          <el-input v-model="form.stuMobile" />
         </el-form-item>
         <el-form-item label="电子邮箱">
-          <el-input v-model="form.email" />
+          <el-input v-model="form.stuEmail" />
         </el-form-item>
         <el-form-item label="出生日期">
           <el-date-picker
-            v-model="form.birthday"
+            v-model="form.stuBirthday"
             type="date"
             placeholder="选择日期"
           />
         </el-form-item>
         <el-form-item label="学生状态">
-          <el-select v-model="form.status">
+          <el-select v-model="form.stuStatus">
             <el-option label="在读" value="在读" />
             <el-option label="休学" value="休学" />
             <el-option label="转班" value="转班" />
@@ -168,17 +168,17 @@
           </el-select>
         </el-form-item>
         <el-form-item label="学历">
-          <el-input v-model="form.edu_background" />
+          <el-input v-model="form.stuEduBackground" />
         </el-form-item>
         <el-form-item label="毕业院校">
-          <el-input v-model="form.edu_school" />
+          <el-input v-model="form.stuEduSchool" />
         </el-form-item>
         <el-form-item label="专业">
-          <el-input v-model="form.major" />
+          <el-input v-model="form.stuMajor" />
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="form.desc"
+            v-model="form.stuDesc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -212,8 +212,8 @@ export default {
       list: [],
       listLoading: true,
       // 搜索框数据
-      s_campus_id: '',
-      s_class_id: '',
+      s_campus_name: '',
+      s_class_name: '',
       s_status: '',
       s_fullname: '',
       s_campusList: [],
@@ -229,32 +229,32 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        campus_id: '',
-        class_id: '',
-        stu_no: '',
-        name: '',
-        sex: '男',
-        mobile: '',
-        email: '',
-        birthday: getDefaultDate(),
-        status: '在读',
-        edu_background: '',
-        edu_school: '',
-        major: '',
-        desc: ''
+        campusName: '',
+        classId: '',
+        stuNo: '',
+        stuName: '',
+        stuSex: '男',
+        stuMobile: '',
+        stuEmail: '',
+        stuBirthday: getDefaultDate(),
+        stuStatus: '在读',
+        stuEduBackground: '',
+        stuEduSchool: '',
+        stuMajor: '',
+        stuDesc: ''
       },
       // rules
       rules: {
-        campus_id: [
+        campusName: [
           { required: true, message: '请选择校区', trigger: 'blur' }
         ],
-        class_id: [
+        className: [
           { required: true, message: '请选择班级', trigger: 'blur' }
         ],
-        stu_no: [
+        stuNo: [
           { required: true, message: '请输入学号', trigger: 'blur' }
         ],
-        name: [
+        stuName: [
           { required: true, message: '请输入姓名', trigger: 'blur' }
         ]
       }
@@ -270,7 +270,12 @@ export default {
       const { data } = await getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
-        query: this.searchValue
+        query: {
+          campusName: this.s_campus_name,
+          className: this.s_class_name,
+          stuStatus: this.s_status,
+          stuName: this.s_fullname
+        }
       })
       this.list = data.items
       this.total = data.total
@@ -304,7 +309,7 @@ export default {
       if (this.dialogTitle === '添加学生') {
         await addStudent(this.form)
       } else if (this.dialogTitle === '修改学生') {
-        await editStudent(this.form.id, this.form)
+        await editStudent(this.form.studentId, this.form)
       }
       this.fetchData()
       this.$message({
@@ -362,6 +367,14 @@ export default {
       })
       this.s_classList = data2.items
       this.classList = data2.items
+    },
+    // 获取年龄
+    getAge (birthday) {
+      const age = new Date().getFullYear() - new Date(birthday).getFullYear()
+      if (isNaN(age)) {
+        return '-'
+      }
+      return age
     }
   }
 }
