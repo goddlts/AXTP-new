@@ -6,8 +6,8 @@
         <el-option
           v-for="item in s_campusList"
           :key="item.id"
-          :label="item.campusName"
-          :value="item.campusName"
+          :label="item.name"
+          :value="item.id"
         />
       </el-select>
       <el-input v-model="s_classroom_name" size="small" placeholder="请输入教室" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
@@ -31,39 +31,39 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="校区" align="center">
         <template slot-scope="scope">
-          {{ scope.row.campusName }}
+          {{ scope.row.campus_name }}
         </template>
       </el-table-column>
       <el-table-column label="教室名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.classroomName }}
+          {{ scope.row.classroom_name }}
         </template>
       </el-table-column>
       <el-table-column label="教室容量" align="center">
         <template slot-scope="scope">
-          {{ scope.row.classroomCount }}
+          {{ scope.row.count }}
         </template>
       </el-table-column>
       <el-table-column label="教室状态" align="center">
         <template slot-scope="scope">
-          {{ scope.row.classroomStatus }}
+          {{ scope.row.status }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.classroomId)">编辑</el-button>
-          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.classroomId)">删除</el-button>
+          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
+          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="pagenum"
+      :current-page="1"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="pagesize"
+      :page-size="8"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
+      :total="400"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -75,24 +75,24 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="校区" prop="campusName">
-          <el-select v-model="form.campusName" placeholder="请选择校区">
+        <el-form-item label="校区" prop="campus_id">
+          <el-select v-model="form.campus_id" placeholder="请选择校区">
             <el-option
               v-for="item in campusList"
-              :key="item.campusId"
-              :label="item.campusName"
-              :value="item.campusName"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
         <el-form-item label="教室名称" prop="classroom_name">
-          <el-input v-model="form.classroomName" />
+          <el-input v-model="form.classroom_name" />
         </el-form-item>
         <el-form-item label="教室容量" prop="count">
-          <el-input v-model="form.classroomCount" />
+          <el-input v-model="form.count" />
         </el-form-item>
         <el-form-item label="教室状态">
-          <el-select v-model="form.classroomStatus">
+          <el-select v-model="form.status">
             <el-option label="空闲" value="空闲" />
             <el-option label="使用" value="使用" />
             <el-option label="维修" value="维修" />
@@ -100,7 +100,7 @@
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="form.classroomDesc"
+            v-model="form.desc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -139,21 +139,21 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        campusName: '',
-        classroomName: '',
-        classroomCount: '',
-        classroomStatus: '空闲',
-        classroomDesc: ''
+        campus_id: '',
+        classroom_name: '',
+        count: '',
+        status: '空闲',
+        desc: ''
       },
       // rules
       rules: {
-        campusName: [
+        campus_id: [
           { required: true, message: '请选择校区', trigger: 'change' }
         ],
-        classroomName: [
+        classroom_name: [
           { required: true, message: '请输入教室名称', trigger: 'blur' }
         ],
-        classroomCount: [
+        count: [
           { required: true, message: '请输入教室容量', trigger: 'blur' }
         ]
       }
@@ -170,8 +170,8 @@ export default {
         pagenum: this.pagenum,
         pagesize: this.pagesize,
         query: JSON.stringify({
-          classroomName: this.s_classroom_name,
-          campusName: this.s_campus_id
+          classroom_name: this.s_classroom_name,
+          campus_id: this.s_campus_id
         })
       })
       this.list = data.items
@@ -206,7 +206,7 @@ export default {
       if (this.dialogTitle === '添加教室') {
         await addClassroom(this.form)
       } else if (this.dialogTitle === '修改教室') {
-        await editClassroom(this.form.classroomId, this.form)
+        await editClassroom(this.form.id, this.form)
       }
       this.fetchData()
       this.$message({
