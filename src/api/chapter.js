@@ -32,7 +32,8 @@ export function editFeedback (id, data) {
 
 export function getList (params) {
   return request({
-    url: '/chapter',
+    // url: '/chapter',
+    url: `http://192.168.15.153:8080/renren-fast/api/chapter`,
     method: 'get',
     params
   })
@@ -40,14 +41,16 @@ export function getList (params) {
 
 export function removeChapter (id) {
   return request({
-    url: `/chapter/${id}`,
+    // url: `/chapter/${id}`,
+    url: `http://192.168.15.153:8080/renren-fast/api/chapter/${id}`,
     method: 'delete'
   })
 }
 
 export function addChapter (data) {
   return request({
-    url: `/chapter`,
+    // url: `/chapter`,
+    url: `http://192.168.15.153:8080/renren-fast/api/chapter`,
     method: 'post',
     data
   })
@@ -55,7 +58,8 @@ export function addChapter (data) {
 
 export function editChapter (id, data) {
   return request({
-    url: `/chapter/${id}`,
+    // url: `/chapter/${id}`,
+    url: `http://192.168.15.153:8080/renren-fast/api/chapter/${id}`,
     method: 'put',
     data
   })
@@ -63,7 +67,8 @@ export function editChapter (id, data) {
 
 export function getChapterById (id) {
   return request({
-    url: `/chapter/${id}`,
+    // url: `/chapter/${id}`,
+    url: `http://192.168.15.153:8080/renren-fast/api/chapter/${id}`,
     method: 'get'
   })
 }

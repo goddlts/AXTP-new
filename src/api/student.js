@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function removeMultiplyStudent (ids) {
+  return request({
+    // url: `/user/${id}`,
+    url: `http://192.168.15.153:8080/renren-fast/api/student?ids=${ids}`,
+    method: 'delete'
+  })
+}
+
 // 点到
 export function callTheRoll (id, data) {
   return request({

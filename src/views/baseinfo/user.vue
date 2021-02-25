@@ -45,7 +45,6 @@
         }"
         :show-file-list="false"
         :on-success="handleUploadSuccess"
-        :file-list="fileList"
       >
         <el-button size="small" type="primary" class="filter-item" icon="el-icon-plus">批量导入员工</el-button>
       </el-upload>
@@ -243,8 +242,6 @@ export default {
           return time.getTime() > Date.now()
         }
       },
-      // 文件上传
-      fileList: [],
       list: [],
       listLoading: true,
       // 绑定搜索框的下拉框/搜索框数据

@@ -4,18 +4,18 @@
     <div class="filter-container">
       <el-select v-model="s_course_id" style="width: 160px" size="small" class="filter-item" placeholder="请选择所属学科" @change="loadBooks">
         <el-option
-          v-for="item in courseList"
-          :key="item.id"
-          :label="item.course_name"
-          :value="item.id"
+          v-for="item in subjectList"
+          :key="item.subjectId"
+          :label="item.subjectName"
+          :value="item.subjectName"
         />
       </el-select>
       <el-select v-model="s_book_id" style="width: 250px" size="small" class="filter-item" placeholder="请选择所属书籍" @change="handleFilter">
         <el-option
           v-for="item in s_bookList"
-          :key="item.id"
-          :label="item.book_name"
-          :value="item.id"
+          :key="item.bookId"
+          :label="item.bookName"
+          :value="item.bookId"
         />
       </el-select>
       <el-input v-model="searchValue" size="small" placeholder="请输入章节" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
@@ -40,39 +40,39 @@
     >
       <el-table-column label="章节名称" align="left">
         <template slot-scope="scope">
-          {{ scope.row.text }}
+          {{ scope.row.chapterName }}
         </template>
       </el-table-column>
       <el-table-column label="学科名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.course_name_version }}
+          {{ scope.row.subjectName }}
         </template>
       </el-table-column>
       <el-table-column label="书籍名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.book_name_version }}
+          {{ scope.row.bookName }}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center">
         <template slot-scope="scope">
-          {{ scope.row.created_time }}
+          {{ scope.row.createdTime }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" width="150">
         <template slot-scope="scope">
-          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
-          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
+          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.chapterId)">编辑</el-button>
+          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.chapterId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="1"
+      :current-page="pagenum"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
+      :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -86,37 +86,37 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="所属学科" prop="course_id">
-          <el-select v-model="form.course_id" placeholder="请选择所属学科" @change="loadBooks1(form.course_id)">
+        <el-form-item label="所属学科" prop="subjectName">
+          <el-select v-model="form.subjectName" placeholder="请选择所属学科" @change="loadBooks1(form.subjectId)">
             <el-option
-              v-for="item in courseList"
-              :key="item.id"
-              :label="item.course_name"
-              :value="item.id"
+              v-for="item in subjectList"
+              :key="item.subjectId"
+              :label="item.subjectName"
+              :value="item.subjectName"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="所属书籍" prop="book_id">
-          <el-select v-model="form.book_id" placeholder="请选择所属书籍">
+        <el-form-item label="所属书籍" prop="bookName">
+          <el-select v-model="form.bookName" placeholder="请选择所属书籍">
             <el-option
               v-for="item in bookList"
-              :key="item.id"
-              :label="item.book_name"
-              :value="item.id"
+              :key="item.bookId"
+              :label="item.bookName"
+              :value="item.bookName"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="章" prop="chapter_name">
-          <el-input v-model="form.chapter_name" />
+        <el-form-item label="章" prop="chapterName">
+          <el-input v-model="form.chapterName" />
         </el-form-item>
-        <el-form-item label="节" prop="sections">
+        <!-- <el-form-item label="节" prop="sections">
           <el-input
             v-model="form.sectionsText"
             type="textarea"
             :rows="6"
             placeholder="请输入小结，小结名称单独占一行"
           />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="备注信息">
           <el-input
             v-model="form.desc"
@@ -133,12 +133,12 @@
         :model="formEdit"
         label-width="100px"
       >
-        <el-form-item label="章/节内容" prop="text">
-          <el-input v-model="formEdit.text" />
+        <el-form-item label="章名称" prop="chapterName">
+          <el-input v-model="formEdit.chapterName" />
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="formEdit.desc"
+            v-model="formEdit.chapterDesc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -155,7 +155,7 @@
 
 <script>
 import { getList, removeChapter, addChapter, editChapter, getChapterById } from '@/api/chapter'
-import { getList as getCourses } from '@/api/course'
+import { getList as getSubjects } from '@/api/subject'
 import { getList as getBooks } from '@/api/book'
 
 export default {
@@ -166,7 +166,7 @@ export default {
       // 搜索框数据
       searchValue: '',
       s_course_id: '',
-      courseList: [],
+      subjectList: [],
       s_book_id: '',
       s_bookList: [],
       bookList: [],
@@ -178,38 +178,35 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        course_id: '',
-        book_id: '',
-        chapter_name: '',
-        sectionsText: '',
-        sections: [],
-        desc: ''
+        subjectName: '',
+        bookName: '',
+        chapterName: '',
+        // sectionsText: '',
+        // sections: [],
+        chapterDesc: ''
       },
       // 标记添加和修改
       addOrEdit: '',
       // rules
       rules: {
-        course_id: [
+        subjectName: [
           { required: true, message: '请选择所属学科', trigger: 'change' }
         ],
-        book_id: [
+        bookName: [
           { required: true, message: '请选择所属书籍', trigger: 'change' }
         ],
-        chapter_name: [
+        chapterName: [
           { required: true, message: '请输入章', trigger: 'blur' }
-        ],
-        sectionsText: [
-          { required: true, message: '请输入节', trigger: 'blur' }
         ]
       },
       formEdit: {
-        id: -1,
-        text: '',
-        desc: ''
+        chapterId: -1,
+        chapterName: '',
+        chapterDesc: ''
       },
       rulesEdit: {
-        text: [
-          { required: true, message: '请输入章/节内容', trigger: 'blur' }
+        chapterName: [
+          { required: true, message: '请输入章名称', trigger: 'blur' }
         ]
       }
     }
@@ -225,9 +222,9 @@ export default {
         pagenum: this.pagenum,
         pagesize: this.pagesize,
         query: JSON.stringify({
-          course_id: this.s_course_id,
-          book_id: this.s_book_id,
-          text: this.searchValue
+          subjectName: this.s_course_id,
+          bookName: this.s_book_id,
+          chapterName: this.searchValue
         })
       })
       this.list = data.items
@@ -269,10 +266,10 @@ export default {
       }
 
       if (this.dialogTitle === '添加章节') {
-        this.form.sections = this.form.sectionsText.split('\n').filter(item => item && item.trim())
+        // this.form.sections = this.form.sectionsText.split('\n').filter(item => item && item.trim())
         await addChapter(this.form)
       } else if (this.dialogTitle === '修改章节') {
-        await editChapter(this.formEdit.id, this.formEdit)
+        await editChapter(this.formEdit.chapterId, this.formEdit)
       }
       this.fetchData()
       this.$message({
@@ -321,18 +318,18 @@ export default {
     },
     // 绑定下拉框
     async loadCourses () {
-      const { data } = await getCourses({
+      const { data } = await getSubjects({
         pagenum: 1,
         pagesize: 1000
       })
-      this.courseList = data.items
+      this.subjectList = data.items
     },
     async loadBooks () {
       const { data } = await getBooks({
         pagenum: 1,
         pagesize: 1000,
         query: JSON.stringify({
-          course_id: this.s_course_id
+          subjectName: this.s_course_id
         })
       })
       this.s_bookList = data.items
@@ -344,7 +341,7 @@ export default {
         pagenum: 1,
         pagesize: 1000,
         query: JSON.stringify({
-          course_id: course_id
+          subjectName: course_id
         })
       })
       this.bookList = data.items

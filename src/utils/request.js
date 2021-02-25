@@ -20,7 +20,7 @@ service.interceptors.request.use(
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       // config.headers['token'] = getToken()
-      config.headers['token'] = '42b0beddd00281b7dc96bafe50be1c9d'
+      config.headers['token'] = 'edcc14ad35ee6f9ba1752ce1fb7764df'
     }
     return config
   },
@@ -53,7 +53,17 @@ service.interceptors.response.use(
       })
       return Promise.reject(new Error(response.statusText || 'Error'))
     }
+
     const res = response.data
+    if (res.code && res.code !== 200 && res.code !== 201) {
+      Message({
+        message: res.msg || 'Error',
+        type: 'error',
+        duration: 5 * 1000
+      })
+      return Promise.reject(new Error(res.msg || 'Error'))
+    }
+
     // if the custom code is not 200/201, it is judged as an error.
     if (res.meta.status !== 200 && res.meta.status !== 201) {
       Message({

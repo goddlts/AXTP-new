@@ -2,12 +2,12 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-select v-model="s_course_id" style="width: 160px" size="small" class="filter-item" placeholder="请选择所属学科">
+      <el-select v-model="s_subject_id" style="width: 160px" size="small" class="filter-item" placeholder="请选择所属学科">
         <el-option
-          v-for="item in courseList"
-          :key="item.id"
-          :label="item.course_name"
-          :value="item.id"
+          v-for="item in subjectList"
+          :key="item.subjectId"
+          :label="item.subjectName"
+          :value="item.subjectName"
         />
       </el-select>
       <el-select v-model="s_book_master_id" style="width: 180px" size="small" class="filter-item" placeholder="请选择书籍负责人">
@@ -15,10 +15,10 @@
           v-for="item in userList"
           :key="item.id"
           :label="item.fullname"
-          :value="item.id"
+          :value="item.fullname"
         />
       </el-select>
-      <el-input v-model="book_name" size="small" placeholder="请输入书籍" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="bookName" size="small" placeholder="请输入书籍" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -44,54 +44,54 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="学科名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.course_name }}
+          {{ scope.row.subjectName }}
         </template>
       </el-table-column>
       <el-table-column label="书籍名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.book_name }}
+          {{ scope.row.bookName }}
         </template>
       </el-table-column>
       <el-table-column label="版本" align="center">
         <template slot-scope="scope">
-          {{ scope.row.version }}
+          {{ scope.row.bookVersion }}
         </template>
       </el-table-column>
       <el-table-column label="是否启用" align="center">
         <template slot-scope="scope">
-          {{ scope.row.in_use }}
+            {{ scope.row.subjectInuse === 0 ? '未启用' : '启用' }}
         </template>
       </el-table-column>
       <el-table-column label="书籍负责人" align="center">
         <template slot-scope="scope">
-          {{ scope.row.book_master }}
+          {{ scope.row.bookMaster }}
         </template>
       </el-table-column>
-      <el-table-column label="班级数量" align="center">
+      <!-- <el-table-column label="班级数量" align="center">
         <template slot-scope="scope">
-          {{ scope.row.in_use_classs_num }}
+          {{ scope.row.bookInuseClassNum }}
         </template>
       </el-table-column>
       <el-table-column label="章数量" align="center">
         <template slot-scope="scope">
-          {{ scope.row.chapter_num }}
+          {{ scope.row.bookChapterNum }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column align="center" label="操作" width="150">
         <template slot-scope="scope">
-          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
-          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
+          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.bookId)">编辑</el-button>
+          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.bookId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="1"
+      :current-page="pagenum"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
+      :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -103,41 +103,41 @@
         :model="form"
         label-width="120px"
       >
-        <el-form-item label="所属学科" prop="course_id">
-          <el-select v-model="form.course_id" placeholder="请选择所属学科">
+        <el-form-item label="所属学科" prop="subjectName">
+          <el-select v-model="form.subjectName" placeholder="请选择所属学科">
             <el-option
-              v-for="item in courseList"
-              :key="item.id"
-              :label="item.course_name"
-              :value="item.id"
+              v-for="item in subjectList"
+              :key="item.subjectId"
+              :label="item.subjectName"
+              :value="item.subjectName"
             />
           </el-select>
         </el-form-item>
         <el-form-item label="书籍负责人" prop="book_master_id">
-          <el-select v-model="form.book_master_id" placeholder="请选择书籍负责人">
+          <el-select v-model="form.bookMaster" placeholder="请选择书籍负责人">
             <el-option
               v-for="item in userList"
               :key="item.id"
               :label="item.fullname"
-              :value="item.id"
+              :value="item.fullname"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="书籍名称" prop="book_name">
-          <el-input v-model="form.book_name" />
+        <el-form-item label="书籍名称" prop="bookName">
+          <el-input v-model="form.bookName" />
         </el-form-item>
-        <el-form-item label="版本" prop="version">
-          <el-input v-model="form.version" />
+        <el-form-item label="版本" prop="bookVersion">
+          <el-input v-model="form.bookVersion" />
         </el-form-item>
         <el-form-item label="是否启用">
-          <el-radio-group v-model="form.in_use">
+          <el-radio-group v-model="form.bookInuse">
             <el-radio :label="true">启用</el-radio>
             <el-radio :label="false">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="form.desc"
+            v-model="form.bookDesc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -155,7 +155,7 @@
 <script>
 import { getList, removeBook, addBook, editBook, getBookById } from '@/api/book'
 import { getList as getUsers } from '@/api/user'
-import { getList as getCourses } from '@/api/course'
+import { getList as getSubjects } from '@/api/subject'
 
 export default {
   data () {
@@ -163,11 +163,11 @@ export default {
       list: [],
       listLoading: true,
       // 搜索框下拉框
-      s_course_id: '',
-      courseList: [],
+      s_subject_id: '',
+      subjectList: [],
       s_book_master_id: '',
       userList: [],
-      book_name: '',
+      bookName: '',
       // 分页数据
       pagenum: 1,
       pagesize: 10,
@@ -176,25 +176,25 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        course_id: '',
-        book_master_id: '',
-        book_name: '',
-        version: '',
-        in_use: true,
-        desc: ''
+        subjectName: '',
+        bookMaster: '',
+        bookName: '',
+        bookVersion: '',
+        bookInuse: true,
+        bookDesc: ''
       },
       // rules
       rules: {
-        course_id: [
+        subjectName: [
           { required: true, message: '请选择所属学科', trigger: 'change' }
         ],
-        book_master_id: [
+        bookMaster: [
           { required: true, message: '请选择书籍负责人', trigger: 'change' }
         ],
-        book_name: [
+        bookName: [
           { required: true, message: '请输入书籍名称', trigger: 'blur' }
         ],
-        version: [
+        bookVersion: [
           { required: true, message: '请输入版本', trigger: 'blur' }
         ]
       }
@@ -207,7 +207,7 @@ export default {
       //   this.s_course_id = ''
       // }
     }
-    console.log(this.s_course_id)
+    // console.log(this.s_course_id)
     this.fetchData()
     this.loadSelect()
   },
@@ -218,9 +218,9 @@ export default {
         pagenum: this.pagenum,
         pagesize: this.pagesize,
         query: JSON.stringify({
-          course_id: this.s_course_id,
-          book_master_id: this.s_book_master_id,
-          book_name: this.book_name
+          subjectName: this.s_subject_id,
+          bookMaster: this.s_book_master_id,
+          bookName: this.bookName
         })
       })
       this.list = data.items
@@ -243,6 +243,8 @@ export default {
       this.dialogTitle = '修改书籍'
       const { data } = await getBookById(id)
       this.form = data
+      // 1和0转换成bool类型
+      this.form.bookInuse = Boolean(this.form.bookInuse)
     },
     // 弹出框的确定按钮
     async handleSure () {
@@ -252,10 +254,11 @@ export default {
         return
       }
 
+      this.form.bookInuse = this.form.bookInuse ? 1 : 0
       if (this.dialogTitle === '添加书籍') {
         await addBook(this.form)
       } else if (this.dialogTitle === '修改书籍') {
-        await editBook(this.form.id, this.form)
+        await editBook(this.form.bookId, this.form)
       }
       this.fetchData()
       this.$message({
@@ -304,11 +307,11 @@ export default {
       })
       this.userList = data1.items
 
-      const { data: data2 } = await getCourses({
+      const { data: data2 } = await getSubjects({
         pagenum: 1,
         pagesize: 1000
       })
-      this.courseList = data2.items
+      this.subjectList = data2.items
     }
   }
 }

@@ -33,9 +33,19 @@
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
         添加学生
       </el-button>
-      <el-button size="small" class="filter-item" type="primary" icon="el-icon-plus" @click="handleShowAddDialog">
-        批量导入学生
-      </el-button>
+      <el-upload
+        style="display: inline-block"
+        action="http://192.168.15.153:8080/renren-fast/api/upload/student"
+        accept="application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        :headers="{
+          token: 'edcc14ad35ee6f9ba1752ce1fb7764df'
+        }"
+        :show-file-list="false"
+        :on-success="handleUploadSuccess"
+      >
+        <el-button size="small" type="primary" class="filter-item" icon="el-icon-plus">批量导入学生</el-button>
+      </el-upload>
+      <el-button size="small" type="primary" class="filter-item" icon="el-icon-minus" @click="handleDeleteMultiple">批量删除学生</el-button>
     </div>
     <!-- 表格 -->
     <el-table
@@ -46,8 +56,14 @@
       stripe
       fit
       highlight-current-row
+      @selection-change="handleSelectionChange"
     >
-      <el-table-column align="center" label="#" width="50" type="index" />
+      <el-table-column
+        type="selection"
+        align="center"
+        width="40"
+      />
+      <!-- <el-table-column align="center" label="#" width="50" type="index" /> -->
       <el-table-column label="学号" align="center">
         <template slot-scope="scope">
           {{ scope.row.stuNo }}
@@ -194,9 +210,10 @@
 </template>
 
 <script>
-import { getList, removeStudent, addStudent, editStudent, getStudentById } from '@/api/student'
+import { getList, removeStudent, addStudent, editStudent, getStudentById, removeMultiplyStudent } from '@/api/student'
 import { getList as getCampuses } from '@/api/campus'
 import { getList as getClasses } from '@/api/class'
+import { getToken } from '@/utils/auth'
 
 function getDefaultDate () {
   const date = new Date()
@@ -209,6 +226,7 @@ function getDefaultDate () {
 export default {
   data () {
     return {
+      token: getToken(),
       list: [],
       listLoading: true,
       // 搜索框数据
@@ -230,7 +248,7 @@ export default {
       dialogFormVisible: false,
       form: {
         campusName: '',
-        classId: '',
+        className: '',
         stuNo: '',
         stuName: '',
         stuSex: '男',
@@ -257,7 +275,9 @@ export default {
         stuName: [
           { required: true, message: '请输入姓名', trigger: 'blur' }
         ]
-      }
+      },
+      // 获取选中的行
+      multipleSelection: []
     }
   },
   created () {
@@ -375,7 +395,44 @@ export default {
         return '-'
       }
       return age
-    }
+    },
+    handleUploadSuccess (res) {
+      this.pagenum = 1
+      this.fetchData()
+      this.$message({
+        type: 'success',
+        message: `批量上传成功，已添加 ${res.data.count} 个学生`
+      })
+    },
+    // 单选框发生改变的时候执行(批量删除使用)
+    handleSelectionChange (rows) {
+      // rows 当前选中的行
+      this.multipleSelection = rows
+    },
+    // 批量删除
+    async handleDeleteMultiple () {
+      if (this.multipleSelection.length <= 0) {
+        return this.$message({
+          type: 'warning',
+          message: '请选择要删除的学生'
+        })
+      }
+      await this.$confirm('此操作将永久删除学生, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      const ids = this.multipleSelection.map(row => {
+        return row.stuId
+      })
+      const count = ids.length
+      await removeMultiplyStudent(ids.splice(','))
+      this.$message({
+        type: 'success',
+        message: `已删除${count}条学生数据`
+      })
+      this.fetchData()
+    },
   }
 }
 </script>

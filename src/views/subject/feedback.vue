@@ -2,20 +2,20 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="course_id" style="width: 160px" size="small" class="filter-item" placeholder="请选择学科" @change="loadBooks(course_id)">
+      <el-select v-model="s_subjectName" style="width: 160px" size="small" class="filter-item" placeholder="请选择学科" @change="loadBooks(s_subjectName)">
         <el-option
-          v-for="item in courseList"
-          :key="item.id"
-          :label="item.course_name"
-          :value="item.id"
+          v-for="item in subjectList"
+          :key="item.subjectId"
+          :label="item.subjectName"
+          :value="item.subjectName"
         />
       </el-select>
-      <el-select v-model="book_id" style="width: 250px" size="small" class="filter-item" placeholder="请选择书籍" @change="fetchData()">
+      <el-select v-model="s_bookName" style="width: 250px" size="small" class="filter-item" placeholder="请选择书籍" @change="fetchData()">
         <el-option
           v-for="item in bookList"
-          :key="item.id"
-          :label="item.book_name"
-          :value="item.id"
+          :key="item.bookId"
+          :label="item.bookName"
+          :value="item.bookName"
         />
       </el-select>
     </div>
@@ -45,16 +45,16 @@
           @row-dblclick="handleFeedbackDbClick"
         >
           <el-table-column
-            prop="feedback_item"
+            prop="feedbackItem"
             label="反馈条目"
           >
             <template slot-scope="scope">
               <span v-if="!scope.row.isEdit">
-                {{ scope.row.feedback_item }}
+                {{ scope.row.feedbackItem }}
               </span>
               <el-input
                 v-else
-                :ref="'myInput' + scope.row.id"
+                :ref="'myInput' + scope.row.feedbackId"
                 v-model="form.text"
                 @blur="handleBlur(scope.row)"
                 @keyup.esc.native="handleKeyupESC(scope.row)"
@@ -64,7 +64,7 @@
           </el-table-column>
           <el-table-column align="center" width="80">
             <template slot-scope="scope">
-              <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
+              <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.feedbackId)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -93,23 +93,23 @@
 </template>
 
 <script>
-import { getList as getCourses } from '@/api/course'
+import { getList as getSubjects } from '@/api/subject'
 import { getList as getBooks } from '@/api/book'
 import { getList, getFeedbacksByChapterId, addFeedbackItems, removeFeedback, editFeedback } from '@/api/chapter'
 
 export default {
   data () {
     return {
-      course_id: '',
-      courseList: [],
-      book_id: '',
+      s_subjectName: '',
+      subjectList: [],
+      s_bookName: '',
       bookList: [],
       chapters: [],
       feeditems: [],
       // 弹出框使用的数据
-      book_name: '',
-      chapter_name: '',
-      chapter_id: '',
+      bookName: '',
+      chapterName: '',
+      chapterId: '',
       dialogFormVisible: false,
       dialogTitle: '',
       feeditemsText: '',
@@ -123,23 +123,23 @@ export default {
     }
   },
   created () {
-    this.loadCourses()
+    this.loadSubjects()
   },
   methods: {
-    async loadCourses () {
-      const { data } = await getCourses({
+    async loadSubjects () {
+      const { data } = await getSubjects({
         pagenum: 1,
         pagesize: 1000
       })
 
-      this.courseList = data.items
+      this.subjectList = data.items
     },
-    async loadBooks (course_id) {
+    async loadBooks (subjectName) {
       const { data } = await getBooks({
         pagenum: 1,
         pagesize: 1000,
         query: JSON.stringify({
-          course_id: course_id
+          subjectName: subjectName
         })
       })
 
@@ -150,8 +150,8 @@ export default {
         pagenum: 1,
         pagesize: 100,
         query: JSON.stringify({
-          course_id: this.course_id,
-          book_id: this.book_id
+          subjectName: this.subjectName,
+          bookName: this.bookName
         })
       })
       this.chapters = data.items
@@ -174,10 +174,10 @@ export default {
     handleDbClick (row) {
       this.dialogFormVisible = true
       // 记录书/章/章id，弹出框使用
-      this.book_name = row.book_name_version
-      this.chapter_name = row.text
-      this.chapter_id = row.id
-      this.dialogTitle = this.book_name + ' - ' + this.chapter_name
+      this.bookName = row.book_name_version
+      this.chapterName = row.text
+      this.chapterId = row.id
+      this.dialogTitle = this.bookName + ' - ' + this.chapterName
     },
     async handleSure () {
       this.dialogFormVisible = false
@@ -185,9 +185,9 @@ export default {
       // 重新加载当前章的反馈条目
       // 只是新增反馈条目，之前的反馈条目还在
       this.form.text = this.text.split('\n').filter(item => item && item.trim())
-      await addFeedbackItems(this.chapter_id, this.form)
+      await addFeedbackItems(this.chapterId, this.form)
 
-      this.loadFeedbacks(this.chapter_id)
+      this.loadFeedbacks(this.chapterId)
       this.$message({
         type: 'success',
         message: '操作成功'
@@ -206,14 +206,14 @@ export default {
         type: 'success',
         message: '删除成功'
       })
-      this.loadFeedbacks(this.chapter_id)
+      this.loadFeedbacks(this.chapterId)
     },
     // 双击反馈项列表，弹出修改对话框
     handleFeedbackDbClick (currentRow) {
       currentRow.isEdit = !currentRow.isEdit
       // 记录当前的反馈项
       this.form.id = currentRow.id
-      this.form.text = currentRow.feedback_item
+      this.form.text = currentRow.feedbackItem
 
       this.$nextTick(() => {
         const id = 'myInput' + this.form.id
@@ -240,7 +240,7 @@ export default {
       // eslint-disable-next-line require-atomic-updates
       row.isEdit = false
       // eslint-disable-next-line require-atomic-updates
-      row.feedback_item = this.form.text
+      row.feedbackItem = this.form.text
 
       this.$message({
         type: 'success',

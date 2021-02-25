@@ -23,49 +23,49 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="学科名称" align="center">
         <template slot-scope="scope">
-          <router-link :to="'/subject/book?cid=' + scope.row.id">{{ scope.row.course_name }}</router-link>
+          <router-link :to="'/subject/book?cid=' + scope.row.id">{{ scope.row.subjectName }}</router-link>
         </template>
       </el-table-column>
       <el-table-column label="版本" align="center">
         <template slot-scope="scope">
-          {{ scope.row.version }}
+          {{ scope.row.subjectVersion }}
         </template>
       </el-table-column>
       <el-table-column label="是否启用" align="center">
         <template slot-scope="scope">
-          {{ scope.row.in_use }}
+          {{ scope.row.subjectInuse === 0 ? '未启用' : '启用' }}
         </template>
       </el-table-column>
       <el-table-column label="学科负责人" align="center">
         <template slot-scope="scope">
-          {{ scope.row.course_master }}
+          {{ scope.row.subjectMaster }}
         </template>
       </el-table-column>
-      <el-table-column label="班级数量" align="center">
+      <!-- <el-table-column label="班级数量" align="center">
         <template slot-scope="scope">
-          {{ scope.row.in_use_classs_num }}
+          {{ scope.row.subjectInuseClasssNum }}
         </template>
       </el-table-column>
       <el-table-column label="书籍数量" align="center">
         <template slot-scope="scope">
-          {{ scope.row.books_num }}
+          {{ scope.row.subjectBooksNum }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column align="center" label="操作" width="150">
         <template slot-scope="scope">
-          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
-          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
+          <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.subjectId)">编辑</el-button>
+          <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.subjectId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="1"
+      :current-page="pagenum"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
+      :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -77,31 +77,31 @@
         :model="form"
         label-width="120px"
       >
-        <el-form-item label="学科负责人" prop="course_master_id">
-          <el-select v-model="form.course_master_id" placeholder="请选择学科负责人">
+        <el-form-item label="学科负责人" prop="subjectMaster">
+          <el-select v-model="form.subjectMaster" placeholder="请选择学科负责人">
             <el-option
               v-for="item in userList"
               :key="item.id"
               :label="item.fullname"
-              :value="item.id"
+              :value="item.fullname"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="学科名称" prop="course_name">
-          <el-input v-model="form.course_name" />
+        <el-form-item label="学科名称" prop="subjectName">
+          <el-input v-model="form.subjectName" />
         </el-form-item>
-        <el-form-item label="版本" prop="version">
-          <el-input v-model="form.version" />
+        <el-form-item label="版本" prop="subjectVersion">
+          <el-input v-model="form.subjectVersion" />
         </el-form-item>
         <el-form-item label="是否启用">
-          <el-radio-group v-model="form.in_use">
+          <el-radio-group v-model="form.subjectInuse">
             <el-radio :label="true">启用</el-radio>
             <el-radio :label="false">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="form.desc"
+            v-model="form.subjectDesc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { getList, removeCourse, addCourse, editCourse, getCourseById } from '@/api/course'
+import { getList, removeSubject, addSubject, editSubject, getSubjectById } from '@/api/subject'
 import { getList as getUsers } from '@/api/user'
 
 export default {
@@ -136,21 +136,21 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        course_master_id: '',
-        course_name: '',
-        version: '',
-        in_use: true,
-        desc: ''
+        subjectMaster: '',
+        subjectName: '',
+        subjectVersion: '',
+        subjectInuse: true,
+        subjectDesc: ''
       },
       // rules
       rules: {
-        course_master_id: [
+        subjectMaster: [
           { required: true, message: '请选择学科负责人', trigger: 'blur' }
         ],
-        course_name: [
+        subjectName: [
           { required: true, message: '请输入学科名称', trigger: 'blur' }
         ],
-        version: [
+        subjectVersion: [
           { required: true, message: '请输入版本', trigger: 'blur' }
         ]
       }
@@ -166,7 +166,9 @@ export default {
       const { data } = await getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
-        query: this.searchValue
+        query: {
+          subjectName: this.searchValue
+        }
       })
       this.list = data.items
       this.total = data.total
@@ -186,8 +188,10 @@ export default {
     async handleShowEditDialog (id) {
       this.dialogFormVisible = true
       this.dialogTitle = '修改学科'
-      const { data } = await getCourseById(id)
+      const { data } = await getSubjectById(id)
       this.form = data
+      // 1和0转换成bool类型
+      this.form.subjectInuse = Boolean(this.form.subjectInuse)
     },
     // 弹出框的确定按钮
     async handleSure () {
@@ -196,11 +200,11 @@ export default {
       if (!valid) {
         return
       }
-
+      this.form.subjectInuse = this.form.subjectInuse ? 1 : 0
       if (this.dialogTitle === '添加学科') {
-        await addCourse(this.form)
+        await addSubject(this.form)
       } else if (this.dialogTitle === '修改学科') {
-        await editCourse(this.form.id, this.form)
+        await editSubject(this.form.subjectId, this.form)
       }
       this.fetchData()
       this.$message({
@@ -226,7 +230,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-      await removeCourse(id)
+      await removeSubject(id)
       this.$message({
         type: 'success',
         message: '删除成功'
