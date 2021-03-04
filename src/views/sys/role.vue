@@ -102,7 +102,7 @@
 
 <script>
 import { getList, removeRole, addRole, editRole, getRoleById } from '@/api/role'
-import { getRoutes } from '@/api/menu'
+import { getMenutrees } from '@/api/menu'
 
 export default {
   data () {
@@ -160,7 +160,7 @@ export default {
         this.listLoading = false
       })
       // 获取权限菜单
-      getRoutes().then(response => {
+      getMenutrees().then(response => {
         this.menuData = response.data
       })
     },
@@ -238,11 +238,13 @@ export default {
     // 打开权限配置的对话框
     handleSetRightsDialog (role) {
       this.checkedIds = JSON.parse(role.menuIds || '[]')
+      console.log(this.checkedIds)
       this.setRightDialogFormVisible = true
       this.form = role
     },
     async handleSetRights () {
-      const arr = this.$refs.tree.getCheckedKeys()
+      // 只获取叶子节点
+      const arr = this.$refs.tree.getCheckedKeys(true)
       await editRole(this.form.id, {
         menuIds: JSON.stringify(arr)
       })

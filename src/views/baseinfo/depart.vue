@@ -2,6 +2,15 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
+      <el-select v-model="s_campusId" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
+        <el-option label="请选择校区" :value="-1" />
+        <el-option
+          v-for="item in s_campusList"
+          :key="item.id"
+          :label="item.campusName"
+          :value="item.id"
+        />
+      </el-select>
       <el-input v-model="searchValue" size="small" placeholder="请输入部门" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" style="margin-left: 10px;" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
@@ -21,6 +30,11 @@
       highlight-current-row
     >
       <el-table-column align="center" label="#" width="50" type="index" />
+      <el-table-column label="校区名称" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.Campus && scope.row.Campus.campusName }}
+        </template>
+      </el-table-column>
       <el-table-column label="部门名称" align="center">
         <template slot-scope="scope">
           {{ scope.row.departName }}
@@ -29,11 +43,6 @@
       <el-table-column label="部门主管" align="center">
         <template slot-scope="scope">
           {{ scope.row.departMaster }}
-        </template>
-      </el-table-column>
-      <el-table-column label="部门人数" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.departCount }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
@@ -62,9 +71,21 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="部门主管" prop="departMaster">
-          <el-select v-model="form.departMaster" filterable placeholder="请选择负责人">
-            <el-option v-for="item in users" :key="item.id" :label="item.fullname" :value="item.fullname" />
+        <el-form-item label="校区" prop="campusId">
+          <el-select v-model="form.campusId" filterable placeholder="请选择校区">
+            <el-option label="请选择校区" :value="-1" />
+            <el-option
+              v-for="item in campusList"
+              :key="item.id"
+              :label="item.campusName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="部门主管" prop="departMasterId">
+          <el-select v-model="form.departMasterId" filterable placeholder="请选择负责人">
+            <el-option label="请选择部门主管" :value="-1" />
+            <el-option v-for="item in users" :key="item.id" :label="item.realname" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="部门名称" prop="departName">
@@ -72,7 +93,7 @@
         </el-form-item>
         <el-form-item label="部门描述">
           <el-input
-            v-model="form.desca"
+            v-model="form.desc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -90,6 +111,7 @@
 <script>
 import { getList, removeDepart, addDepart, editDepart, getDepartById } from '@/api/depart'
 import { getList as getUsers } from '@/api/user'
+import { getList as getCampuses } from '@/api/campus'
 
 export default {
   data () {
@@ -97,6 +119,10 @@ export default {
       list: [],
       listLoading: true,
       searchValue: '',
+      // 下拉框
+      s_campusId: -1,
+      s_campusList: [],
+      campusList: [],
       // 分页数据
       pagenum: 1,
       pagesize: 10,
@@ -105,14 +131,17 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        departMaster: '',
+        campusId: -1,
+        departMasterId: -1,
         departName: '',
-        desca: ''
+        desc: ''
       },
       users: [],
-      // rules
       rules: {
-        departMaster: [
+        campusId: [
+          { required: true, message: '请选择校区', trigger: 'blur' }
+        ],
+        departMasterId: [
           { required: true, message: '请选择部门主管', trigger: 'blur' }
         ],
         departName: [
@@ -124,15 +153,27 @@ export default {
   created () {
     this.fetchData()
     this.loadUser()
+    // 加载校区下拉框
+    this.loadCampus()
   },
   methods: {
+    async loadCampus () {
+      const { data } = await getCampuses({
+        pagenum: 1,
+        pagesize: 1000
+      })
+      this.s_campusList = data.items
+
+      this.campusList = [...this.s_campusList]
+    },
     async fetchData () {
       this.listLoading = true
       const { data } = await getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
         query: {
-          departName: this.searchValue
+          departName: this.searchValue,
+          campusId: this.s_campusId
         }
       })
       this.list = data.items

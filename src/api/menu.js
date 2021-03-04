@@ -3,6 +3,13 @@ import request from '@/utils/request'
 // 获取权限菜单
 export function getRoutes () {
   return request({
+    url: '/menu/routes',
+    method: 'get'
+  })
+}
+// 获取所有的菜单(不包含隐藏菜单)
+export function getMenutrees () {
+  return request({
     url: '/menu/menutrees',
     method: 'get'
   })

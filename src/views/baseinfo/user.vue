@@ -2,31 +2,34 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-select v-model="s_campusName" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
+      <el-select v-model="s_campusId" style="width: 140px" filterable size="small" class="filter-item" placeholder="请选择校区" @change="campusChange">
+        <el-option label="请选择校区" :value="-1" />
         <el-option
           v-for="item in s_campusList"
           :key="item.id"
           :label="item.campusName"
-          :value="item.campusName"
+          :value="item.id"
         />
       </el-select>
-      <el-select v-model="s_departName" style="width: 140px" size="small" class="filter-item" placeholder="请选择部门" @change="handleFilter">
+      <el-select v-model="s_departId" style="width: 140px" filterable size="small" class="filter-item" placeholder="请选择部门" @change="handleFilter">
+        <el-option label="请选择部门" :value="-1" />
         <el-option
           v-for="item in s_departList"
           :key="item.id"
           :label="item.departName"
-          :value="item.departName"
+          :value="item.id"
         />
       </el-select>
-      <el-select v-model="s_roleName" style="width: 140px" size="small" class="filter-item" placeholder="请选择角色">
+      <el-select v-model="s_roleId" style="width: 140px" filterable size="small" class="filter-item" placeholder="请选择角色" @change="handleFilter">
+        <el-option label="请选择角色" :value="-1" />
         <el-option
           v-for="item in s_roleList"
           :key="item.id"
           :label="item.roleName"
-          :value="item.roleName"
+          :value="item.id"
         />
       </el-select>
-      <el-input v-model="s_fullname" size="small" placeholder="请输入员工姓名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="s_realname" size="small" placeholder="请输入员工姓名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
@@ -69,22 +72,22 @@
       <!-- <el-table-column align="center" label="#" width="50" type="index" /> -->
       <el-table-column label="员工姓名" width="80" align="center">
         <template slot-scope="scope">
-          {{ scope.row.fullname }}
+          {{ scope.row.realname }}
         </template>
       </el-table-column>
       <el-table-column label="校区" align="center">
         <template slot-scope="scope">
-          {{ scope.row.campusName }}
+          {{ scope.row.Campus && scope.row.Campus.campusName }}
         </template>
       </el-table-column>
       <el-table-column label="部门" align="center">
         <template slot-scope="scope">
-          {{ scope.row.departName }}
+          {{ scope.row.Depart && scope.row.Depart.departName }}
         </template>
       </el-table-column>
       <el-table-column label="角色" align="center">
         <template slot-scope="scope">
-          {{ scope.row.roleName }}
+          {{ scope.row.Role && scope.row.Role.roleName }}
         </template>
       </el-table-column>
       <el-table-column label="性别" align="center">
@@ -97,14 +100,14 @@
           {{ getAge(scope.row.birthday) }}
         </template>
       </el-table-column>
-      <el-table-column label="电话" align="center">
+      <el-table-column label="电话" align="center" width="120">
         <template slot-scope="scope">
           {{ scope.row.mobile }}
         </template>
       </el-table-column>
       <el-table-column label="员工状态" align="center">
         <template slot-scope="scope">
-          {{ scope.row.statusa }}
+          {{ scope.row.status }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作" width="200">
@@ -133,44 +136,47 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="校区" prop="campusName">
-          <el-select v-model="form.campusName" placeholder="请选择校区">
+        <el-form-item label="校区" prop="campusId">
+          <el-select v-model="form.CampusId" filterable placeholder="请选择校区" @change="campusChange1">
+            <el-option label="请选择校区" :value="-1" />
             <el-option
               v-for="item in campusList"
               :key="item.id"
               :label="item.campusName"
-              :value="item.campusName"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="部门" prop="departName">
-          <el-select v-model="form.departName" placeholder="请选择部门">
+        <el-form-item label="部门" prop="departId">
+          <el-select v-model="form.DepartId" filterable placeholder="请选择部门">
+            <el-option label="请选择部门" :value="-1" />
             <el-option
               v-for="item in departList"
               :key="item.id"
               :label="item.departName"
-              :value="item.departName"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="角色" prop="roleName">
-          <el-select v-model="form.roleName" placeholder="请选择角色">
+        <el-form-item label="角色" prop="roleId">
+          <el-select v-model="form.RoleId" filterable placeholder="请选择角色">
+            <el-option label="请选择角色" :value="-1" />
             <el-option
               v-for="item in roleList"
               :key="item.id"
               :label="item.roleName"
-              :value="item.roleName"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="工号" prop="userNo">
-          <el-input v-model="form.userNo" />
+        <el-form-item label="工号" prop="jobNumber">
+          <el-input v-model="form.jobNumber" />
         </el-form-item>
         <el-form-item label="登录名" prop="username">
           <el-input v-model="form.username" />
         </el-form-item>
-        <el-form-item label="真实姓名" prop="fullname">
-          <el-input v-model="form.fullname" />
+        <el-form-item label="真实姓名" prop="realname">
+          <el-input v-model="form.realname" />
         </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="form.sex">
@@ -181,10 +187,10 @@
         <el-form-item label="手机号码" prop="mobile">
           <el-input v-model="form.mobile" />
         </el-form-item>
-        <el-form-item label="电子邮箱">
+        <el-form-item label="电子邮箱" prop="email">
           <el-input v-model="form.email" />
         </el-form-item>
-        <el-form-item label="出生日期">
+        <el-form-item label="出生日期" prop="birthday">
           <el-date-picker
             v-model="form.birthday"
             style="width: 200px"
@@ -195,7 +201,7 @@
           />
         </el-form-item>
         <el-form-item label="员工状态">
-          <el-select v-model="form.statusa" style="width: 200px">
+          <el-select v-model="form.status" style="width: 200px">
             <el-option label="在职" value="在职" />
             <el-option label="离职" value="离职" />
           </el-select>
@@ -211,7 +217,7 @@
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="form.desca"
+            v-model="form.desc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -245,17 +251,15 @@ export default {
       list: [],
       listLoading: true,
       // 绑定搜索框的下拉框/搜索框数据
-      s_campusName: '',
-      s_departName: '',
-      s_fullname: '',
-      s_roleName: '',
+      s_campusId: -1,
+      s_departId: -1,
+      s_realname: '',
+      s_roleId: -1,
       s_campusList: [],
       s_departList: [],
       s_roleList: [],
       // 绑定表单中的下拉框
-      campusName: '',
-      departName: '',
-      fullname: '',
+      realname: '',
       campusList: [],
       departList: [],
       roleList: [],
@@ -267,21 +271,21 @@ export default {
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        campusName: '',
-        departName: '',
-        roleName: '',
-        userNo: '',
+        campusId: -1,
+        departId: -1,
+        roleId: -1,
+        jobNumber: '',
         username: '',
-        fullname: '',
+        realname: '',
         sex: '男',
         mobile: '',
         email: '',
         birthday: '',
-        statusa: '在职',
+        status: '在职',
         eduBackground: '',
         eduSchool: '',
         major: '',
-        desca: ''
+        desc: ''
       },
       // rules
       rules: {
@@ -294,17 +298,23 @@ export default {
         roleName: [
           { required: true, message: '请选择角色', trigger: 'change' }
         ],
-        userNo: [
+        jobNumber: [
           { required: true, message: '请输入工号', trigger: 'blur' }
         ],
         username: [
           { required: true, message: '请输入登录名', trigger: 'blur' }
         ],
-        fullname: [
+        realname: [
           { required: true, message: '请输入真实姓名', trigger: 'blur' }
         ],
         mobile: [
           { required: true, message: '请输入手机号码', trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入电子邮箱', trigger: 'blur' }
+        ],
+        birthday: [
+          { required: true, message: '请输入出生日期', trigger: 'blur' }
         ]
       },
       // 获取选中的行
@@ -316,16 +326,41 @@ export default {
     this.loadSelect()
   },
   methods: {
+    // 选择校区，自动加载该校区下的部门
+    async campusChange () {
+      const { data } = await getDepartments({
+        pagenum: 1,
+        pagesize: 1000,
+        query: JSON.stringify({
+          campusId: this.s_campusId,
+        })
+      })
+      this.s_departList = data.items
+
+      this.handleFilter()
+    },
+    async campusChange1 () {
+      const { data } = await getDepartments({
+        pagenum: 1,
+        pagesize: 1000,
+        query: JSON.stringify({
+          campusId: this.form.campusId,
+        })
+      })
+      this.departList = data.items
+
+      this.handleFilter()
+    },
     async fetchData () {
       this.listLoading = true
       const { data } = await getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
         query: JSON.stringify({
-          campusName: this.s_campusName,
-          departName: this.s_departName,
-          roleName: this.s_roleName,
-          fullname: this.s_fullname
+          campusId: this.s_campusId,
+          departId: this.s_departId,
+          roleId: this.s_roleId,
+          realname: this.s_realname
         })
       })
       this.list = data.items

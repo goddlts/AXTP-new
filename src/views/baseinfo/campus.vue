@@ -28,12 +28,12 @@
       </el-table-column>
       <el-table-column label="负责人" align="center">
         <template slot-scope="scope">
-          {{ scope.row.campusMasterName }}
+          {{ scope.row.masterName }}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center">
         <template slot-scope="scope">
-          {{ scope.row.createdTime }}
+          {{ scope.row.createdAt | formatDate('{y}-{m}-{d}') }}
         </template>
       </el-table-column>
       <el-table-column align="center" label="操作">
@@ -62,9 +62,9 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="负责人" prop="campusMasterName">
-          <el-select v-model="form.campusMasterName" filterable placeholder="请选择负责人">
-            <el-option v-for="item in users" :key="item.id" :label="item.fullname" :value="item.fullname" />
+        <el-form-item label="负责人" prop="campusMasterId">
+          <el-select v-model="form.campusMasterId" filterable placeholder="请选择负责人">
+            <el-option v-for="item in users" :key="item.id" :label="item.realname" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="校区名称" prop="campusName">
@@ -72,7 +72,7 @@
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
-            v-model="form.desca"
+            v-model="form.desc"
             type="textarea"
             :rows="3"
             placeholder="请输入内容"
@@ -99,15 +99,15 @@ export default {
       searchValue: '',
       // 分页数据
       pagenum: 1,
-      pagesize: 10,
+      pagesize: 8,
       total: 0,
       // 弹出框数据
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        campusMasterName: '',
+        campusMasterId: '',
         campusName: '',
-        desca: ''
+        desc: ''
       },
       // 下拉框数据
       users: [],
@@ -116,7 +116,7 @@ export default {
         campusName: [
           { required: true, message: '请输入校区名称', trigger: 'blur' }
         ],
-        campusMasterName: [
+        campusMasterId: [
           { required: true, message: '请输入校区负责人', trigger: 'blur' }
         ]
       }
