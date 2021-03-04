@@ -22,19 +22,9 @@
       fit
       highlight-current-row
     >
-      <el-table-column label="类型" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.type }}
-        </template>
-      </el-table-column>
       <el-table-column label="名称" align="center" width="150">
         <template slot-scope="scope">
-          {{ scope.row.menu_name }}
-        </template>
-      </el-table-column>
-      <el-table-column label="编码" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.route_name }}
+          {{ scope.row.menuName }}
         </template>
       </el-table-column>
       <el-table-column label="图标" align="center">
@@ -47,9 +37,9 @@
           {{ scope.row.component }}
         </template>
       </el-table-column>
-      <el-table-column label="URL" align="center">
+      <el-table-column label="路径" align="center">
         <template slot-scope="scope">
-          {{ scope.row.url }}
+          {{ scope.row.path }}
         </template>
       </el-table-column>
       <el-table-column label="是否隐藏" align="center">
@@ -69,17 +59,6 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- 分页 -->
-    <el-pagination
-      style="margin-top: 10px"
-      :current-page="1"
-      :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
     <!-- 弹出框 -->
     <el-dialog label-width="10px" :title="dialogTitle" :visible.sync="dialogFormVisible">
       <el-form
@@ -90,63 +69,46 @@
         label-width="100px"
       >
         <el-form-item label="类型">
-          <el-radio-group v-model="form.type" @change="handleRadioChange">
+          <el-radio-group v-model="type" @change="handleRadioChange">
             <el-radio label="目录">目录</el-radio>
             <el-radio label="菜单">菜单</el-radio>
-            <el-radio label="按钮">按钮</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item :label="form.type + '名称'" prop="menu_name">
-          <el-input v-model="form.menu_name" />
+        <el-form-item :label="'名称'" prop="menuName">
+          <el-input v-model="form.menuName" />
         </el-form-item>
         <el-form-item
-          v-if="form.type === '按钮' || form.type === '菜单'"
+          v-if="type === '菜单'"
           label="上级菜单"
-          prop="parent_id"
+          prop="parentId"
         >
           <!-- 下拉框 -->
-          <el-select v-if="form.type === '菜单'" v-model="form.parent_id" placeholder="请选择父级目录">
+          <el-select v-model="selectedValue" placeholder="请选择父级目录">
             <el-option
               v-for="item in options"
               :key="item.id"
-              :label="item.menu_name"
+              :label="item.menuName"
               :value="item.id"
             />
           </el-select>
-          <!-- 级联下拉框 -->
-          <el-cascader
-            v-if="form.type === '按钮'"
-            v-model="form.parent_id"
-            :options="options"
-            :props="{
-              expandTrigger: 'hover',
-              label: 'menu_name',
-              value: 'id'
-            }"
-            placeholder="请选择父级菜单"
-          />
         </el-form-item>
         <el-form-item
-          v-if="form.type === '目录' || form.type === '菜单'"
-          label="编码"
-          prop="route_name"
-        >
-          <el-input v-model="form.route_name" />
-        </el-form-item>
-        <el-form-item
-          v-if="form.type === '菜单'"
+          v-if="type === '菜单'"
           label="组件"
           prop="component"
         >
           <el-input v-model="form.component" />
         </el-form-item>
-        <el-form-item :label="form.type === '按钮' ? '权限标识' : '路由地址'" prop="url">
-          <el-input v-model="form.url" />
+        <el-form-item :label="'路由地址'" prop="path">
+          <el-input v-model="form.path" />
         </el-form-item>
-        <el-form-item v-if="form.type !== '按钮'" label="排序">
+        <el-form-item label="排序">
           <el-input-number v-model="form.order" :min="0" :max="100" controls-position="right" />
         </el-form-item>
-        <el-form-item v-if="form.type !== '按钮'" label="图标">
+        <el-form-item v-if="type === '菜单'" label="是否隐藏">
+          <el-input v-model="form.hidden" />
+        </el-form-item>
+        <el-form-item label="图标">
           <el-input v-model="form.icon" />
         </el-form-item>
       </el-form>
@@ -159,7 +121,6 @@
 </template>
 
 <script>
-// import { getList, removeMenu, addMenu, editMenu, getMenuById, getMenuSelect } from '@/api/menu'
 import { getList, removeMenu, addMenu, editMenu, getMenuSelect } from '@/api/menu'
 
 export default {
@@ -168,42 +129,35 @@ export default {
       list: [],
       listLoading: true,
       searchValue: '',
-      // 分页数据
-      pagenum: 1,
-      pagesize: 10,
-      total: 0,
       // 弹出框数据
       dialogTitle: '',
       dialogFormVisible: false,
       // 给form 设置一个唯一key，当点击radio的时候重新设置
       form_key: Math.random(),
       form: {
-        parent_id: '',
-        menu_name: '',
-        route_name: '',
+        parentId: 0,
+        menuName: '',
         icon: '',
         component: '',
-        type: '目录',
-        url: '',
+        path: '',
         hidden: false,
         order: 0
       },
+      type: '目录',
       // 下拉框绑定的数据
       options: [],
+      selectedValue: '',
       rules: {
-        menu_name: [
+        menuName: [
           { required: true, message: '请输入菜单名称', trigger: 'blur' }
         ],
-        parent_id: [
+        parentId: [
           { required: true, message: '请选择父菜单', trigger: 'change' }
-        ],
-        route_name: [
-          { required: true, message: '请输入编码', trigger: 'blur' }
         ],
         component: [
           { required: true, message: '请输入组件', trigger: 'blur' }
         ],
-        url: [
+        path: [
           { required: true, message: '请输入URL', trigger: 'blur' }
         ]
       }
@@ -216,12 +170,11 @@ export default {
     fetchData () {
       this.listLoading = true
       getList({
-        pagenum: this.pagenum,
-        pagesize: this.pagesize,
-        query: this.searchValue
+        query: {
+          menuName: this.searchValue
+        }
       }).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        this.list = response.data
         this.listLoading = false
       })
     },
@@ -258,15 +211,13 @@ export default {
     async handleShowEditDialog (menu) {
       this.dialogFormVisible = true
       this.dialogTitle = '修改菜单'
-      // const { data } = await getMenuById(menu.id)
-      // this.form = data
+
       this.form = menu
+
       let level = -1
-      if (menu.type === '菜单') {
+      if (this.type === '菜单') {
         level = 1
-        this.loadMenuSelect(level)
-      } else if (menu.type === '按钮') {
-        level = 2
+        this.selectedValue = this.form.parentId
         this.loadMenuSelect(level)
       }
     },
@@ -282,24 +233,21 @@ export default {
         return false
       }
 
-      console.log(this.form.parent_id)
-
       // 根据 type 判断，当前添加的是 目录/菜单/按钮，对数据处理
-      switch (this.form.type) {
+      switch (this.type) {
         case '目录':
-          this.form.parent_id = ''
+          this.form.parentId = 0
           this.form.component = 'layout'
           break
         case '菜单':
-          break
-        case '按钮':
-          this.form.parent_id = this.form.parent_id.length === 2 ? this.form.parent_id[1] : ''
+          this.form.parentId = this.selectedValue
           break
         default:
           break
       }
 
       if (this.dialogTitle === '添加菜单') {
+        delete this.form.id
         await addMenu(this.form)
       } else if (this.dialogTitle === '修改菜单') {
         await editMenu(this.form.id, this.form)
@@ -311,16 +259,6 @@ export default {
       })
       this.dialogFormVisible = false
       this.$refs.ruleForm.resetFields()
-    },
-    // 分页方法
-    handleSizeChange (val) {
-      this.pagesize = val
-      this.pagenum = 1
-      this.fetchData()
-    },
-    handleCurrentChange (val) {
-      this.pagenum = val
-      this.fetchData()
     },
     // 删除
     async handleDelete (id) {
@@ -334,10 +272,6 @@ export default {
         type: 'success',
         message: '删除成功'
       })
-      // 处理最后一页只有一条数据的问题
-      if (this.pagenum > 1 && this.list.count === 1) {
-        this.pagenum--
-      }
       this.fetchData()
     }
   }

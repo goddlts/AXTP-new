@@ -11,7 +11,7 @@ export function getRoutes () {
 // 绑定菜单下拉框的数据
 export function getMenuSelect (level) {
   return request({
-    url: '/menu-select',
+    url: 'menu/menu-select',
     method: 'get',
     params: {
       level
