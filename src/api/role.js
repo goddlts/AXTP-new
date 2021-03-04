@@ -14,7 +14,6 @@ export function setRoleForUsers (roleId, userIds) {
 export function getList (params) {
   return request({
     url: '/role',
-    // url: 'http://192.168.15.153:8080/renren-fast/api/role',
     method: 'get',
     params
   })

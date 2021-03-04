@@ -23,12 +23,12 @@
       <el-table-column align="center" label="#" width="50" type="index" />
       <el-table-column label="角色名称" align="center">
         <template slot-scope="scope">
-          {{ scope.row.role_name }}
+          {{ scope.row.roleName }}
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center">
         <template slot-scope="scope">
-          {{ scope.row.created_time }}
+          {{ scope.row.createdAt | formatDate('{y}-{m}-{d}') }}
         </template>
       </el-table-column>
       <el-table-column label="描述" align="center">
@@ -40,18 +40,18 @@
         <template slot-scope="scope">
           <el-button type="text" size="mini" icon="el-icon-edit" @click="handleShowEditDialog(scope.row.id)">编辑</el-button>
           <el-button type="text" size="mini" icon="el-icon-delete" @click="handleDelete(scope.row.id)">删除</el-button>
-          <el-button type="text" size="mini" icon="el-icon-setting" @click="setRightDialogFormVisible = true">权限配置</el-button>
+          <el-button type="text" size="mini" icon="el-icon-setting" @click="handleSetRightsDialog(scope.row)">权限配置</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="1"
+      :current-page="pagenum"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
+      :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -63,8 +63,8 @@
         :model="form"
         label-width="100px"
       >
-        <el-form-item label="角色名称" prop="role_name">
-          <el-input v-model="form.role_name" />
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="form.roleName" />
         </el-form-item>
         <el-form-item label="备注信息">
           <el-input
@@ -81,8 +81,9 @@
       </div>
     </el-dialog>
     <!-- 分配权限 -->
-    <el-dialog label-width="10px" title="分配角色" :visible.sync="setRightDialogFormVisible">
+    <el-dialog label-width="10px" title="权限配置" :visible.sync="setRightDialogFormVisible">
       <el-tree
+        :key="Date.now()"
         ref="tree"
         :data="menuData"
         node-key="id"
@@ -93,7 +94,7 @@
       />
       <div slot="footer" class="dialog-footer">
         <el-button @click="setRightDialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="setRightDialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="handleSetRights">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -111,13 +112,13 @@ export default {
       searchValue: '',
       // 分页数据
       pagenum: 1,
-      pagesize: 10,
+      pagesize: 8,
       total: 0,
       // 弹出框数据
       dialogTitle: '',
       dialogFormVisible: false,
       form: {
-        role_name: '',
+        roleName: '',
         desc: ''
       },
       // 分配权限数据
@@ -134,7 +135,7 @@ export default {
       },
       // 表单验证数据
       rules: {
-        role_name: [
+        roleName: [
           { required: true, message: '请输入角色名称', trigger: 'blur' },
           { pattern: /^[\u4e00-\u9fa5]{2,10}$/, message: '请输入2到10个汉字', trigger: 'blur' }
         ]
@@ -150,7 +151,9 @@ export default {
       getList({
         pagenum: this.pagenum,
         pagesize: this.pagesize,
-        query: this.searchValue
+        query: {
+          roleName: this.searchValue
+        }
       }).then(response => {
         this.list = response.data.items
         this.total = response.data.total
@@ -181,7 +184,6 @@ export default {
     // 弹出框的确定按钮
     async handleSure () {
       // 表单验证
-
       let valid = false
       await this.$refs.ruleForm.validate(v => {
         valid = v
@@ -192,6 +194,7 @@ export default {
       }
 
       if (this.dialogTitle === '添加角色') {
+        this.form.id ? delete this.form.id : ''
         await addRole(this.form)
       } else if (this.dialogTitle === '修改角色') {
         await editRole(this.form.id, this.form)
@@ -231,6 +234,24 @@ export default {
         this.pagenum--
       }
       this.fetchData()
+    },
+    // 打开权限配置的对话框
+    handleSetRightsDialog (role) {
+      this.checkedIds = JSON.parse(role.menuIds || '[]')
+      this.setRightDialogFormVisible = true
+      this.form = role
+    },
+    async handleSetRights () {
+      const arr = this.$refs.tree.getCheckedKeys()
+      await editRole(this.form.id, {
+        menuIds: JSON.stringify(arr)
+      })
+      this.setRightDialogFormVisible = false
+      this.form.menuIds = JSON.stringify(arr)
+      this.$message({
+        type: 'success',
+        message: '权限更新成功'
+      })
     }
   }
 }

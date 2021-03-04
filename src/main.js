@@ -1,5 +1,5 @@
 import Vue from 'vue'
-
+import { parseTime } from './utils/index'
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
 import ElementUI from 'element-ui'
@@ -26,6 +26,10 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
+
+Vue.filter('formatDate', (v, m) => {
+  return parseTime(v, m)
+})
 
 // 如果想要中文版 element-ui，按如下方式声明
 Vue.use(ElementUI)
