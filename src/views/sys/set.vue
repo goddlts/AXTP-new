@@ -2,36 +2,36 @@
   <div class="app-container">
     <!-- 表头 -->
     <div class="filter-container">
-      <el-select v-model="campus_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
+      <el-select v-model="campusId" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区" @change="handleFilter">
         <el-option label="请选择校区" :value="-1" />
         <el-option
           v-for="item in campusList"
           :key="item.id"
-          :label="item.name"
+          :label="item.campusName"
           :value="item.id"
         />
       </el-select>
-      <el-select v-model="depart_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择部门" @change="handleFilter">
+      <el-select v-model="departId" style="width: 140px" size="small" class="filter-item" placeholder="请选择部门" @change="handleFilter">
         <el-option label="请选择部门" :value="-1" />
         <el-option
           v-for="item in departList"
           :key="item.id"
-          :label="item.depart_name"
+          :label="item.departName"
           :value="item.id"
         />
       </el-select>
-      <el-input v-model="fullname" size="small" placeholder="请输入员工姓名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+      <el-input v-model="realname" size="small" placeholder="请输入员工姓名" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
       <el-button size="small" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         搜索
       </el-button>
     </div>
     <div class="filter-container">
-      <el-select v-model="role_id" style="width: 140px" size="small" class="filter-item" placeholder="请选择校区">
+      <el-select v-model="roleId" style="width: 140px" size="small" class="filter-item" placeholder="请选择角色">
         <el-option label="请选择角色" :value="-1" />
         <el-option
           v-for="item in roleList"
           :key="item.id"
-          :label="item.role_name"
+          :label="item.roleName"
           :value="item.id"
         />
       </el-select>
@@ -56,33 +56,33 @@
       />
       <el-table-column label="校区" align="center">
         <template slot-scope="scope">
-          {{ scope.row.campus_name }}
+          {{ scope.row.Campus && scope.row.Campus.campusName }}
         </template>
       </el-table-column>
       <el-table-column label="部门" align="center">
         <template slot-scope="scope">
-          {{ scope.row.depart_name }}
+          {{ scope.row.Depart && scope.row.Depart.departName }}
         </template>
       </el-table-column>
       <el-table-column label="员工姓名" align="center">
         <template slot-scope="scope">
-          {{ scope.row.fullname }}
+          {{ scope.row.realname }}
         </template>
       </el-table-column>
       <el-table-column label="角色" align="center">
         <template slot-scope="scope">
-          {{ scope.row.role_name }}
+          {{ scope.row.Role && scope.row.Role.roleName }}
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <el-pagination
       style="margin-top: 10px"
-      :current-page="1"
+      :current-page="pagenum"
       :page-sizes="[8, 16, 32, 64]"
-      :page-size="8"
+      :page-size="pagesize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="400"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -106,16 +106,16 @@ export default {
       list: [],
       listLoading: true,
       // 绑定下拉框/搜索框数据
-      campus_id: '',
-      depart_id: '',
-      fullname: '',
-      role_id: '',
+      campusId: '',
+      departId: '',
+      realname: '',
+      roleId: -1,
       campusList: [],
       departList: [],
       roleList: [],
       // 分页数据
       pagenum: 1,
-      pagesize: 10,
+      pagesize: 8,
       total: 0
     }
   },
@@ -130,9 +130,9 @@ export default {
         pagenum: this.pagenum,
         pagesize: this.pagesize,
         query: JSON.stringify({
-          campus_id: this.campus_id,
-          depart_id: this.depart_id,
-          fullname: this.fullname
+          campusId: this.campusId,
+          departId: this.departId,
+          realname: this.realname
         })
       }).then(response => {
         this.list = response.data.items
@@ -182,7 +182,7 @@ export default {
       // this.role_id
       // 用户ids，获取表格中选择行的id
       // setRoleForUsers
-      if (this.role_id === -1) {
+      if (this.roleId === -1) {
         this.$message({
           type: 'warning',
           message: '请选择要设置的角色'
@@ -200,7 +200,8 @@ export default {
       }
 
       const uids = selUsers.map(u => u.id)
-      await setRoleForUsers(this.role_id, uids.join(','))
+      await setRoleForUsers(this.roleId, uids.join(','))
+      this.fetchData()
       this.$message({
         type: 'success',
         message: '权限设置成功'
