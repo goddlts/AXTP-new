@@ -2,24 +2,22 @@ import request from '@/utils/request'
 
 export function login (data) {
   return request({
-    url: '/login',
-    // url: `http://192.168.15.153:8080/renren-fast/sys/login`,
+    url: '/auth/login',
     method: 'post',
     data
   })
 }
 
-export function getInfo (token) {
+export function getInfo () {
   return request({
-    url: '/profile',
-    method: 'get',
-    params: { token }
+    url: '/auth/me',
+    method: 'get'
   })
 }
 
 export function logout () {
   return request({
-    url: '/logout',
+    url: '/auth/logout',
     method: 'get'
   })
 }

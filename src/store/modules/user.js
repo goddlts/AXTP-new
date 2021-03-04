@@ -23,9 +23,6 @@ const mutations = {
   },
   SET_PROFILE: (state, profile) => {
     state.profile = profile
-  },
-  SET_PERMISSONS: (state, permissions) => {
-    state.permissions = permissions
   }
 }
 
@@ -36,8 +33,9 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password.trim() }).then(response => {
         const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        const token = `Bearer ${data}`
+        commit('SET_TOKEN', token)
+        setToken(token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -48,22 +46,12 @@ const actions = {
   // get user info
   getInfo ({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo().then(response => {
         const { data } = response
-
         if (!data) {
           reject('Verification failed, please Login again.')
         }
-
-        const { profile, permissions } = data
-
-        // roles must be a non-empty array
-        if (!profile.role) {
-          reject('getInfo: role must be not null!')
-        }
-
-        commit('SET_PROFILE', profile)
-        commit('SET_PERMISSONS', permissions)
+        commit('SET_PROFILE', data)
         resolve(data)
       }).catch(error => {
         reject(error)

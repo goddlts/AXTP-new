@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">欢迎回来: {{ profile.fullname }}</div>
-    <div class="dashboard-text">role: {{ profile.role }}</div>
+    <div class="dashboard-text">欢迎回来: {{ profile.realname }}</div>
+    <div class="dashboard-text">role: {{ profile.roleName }}</div>
   </div>
 </template>
 

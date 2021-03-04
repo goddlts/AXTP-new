@@ -18,12 +18,12 @@ const actions = {
   generateRoutes ({ commit }) {
     return new Promise((resolve, reject) => {
       getRoutes().then(res => {
-        if (res.meta.status === 200) {
+        if (res.code === 200) {
           const routes = traverseRoutes(res.data)
           commit('SET_ROUTES', routes)
           resolve(routes)
         } else {
-          reject(res.meta.msg || new Error('get routes error'))
+          reject(res.message || new Error('get routes error'))
         }
       })
     })
